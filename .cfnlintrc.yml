@@ -1,0 +1,2 @@
+ignore_checks:
+  - W3002 # This code may only work with `package` cli command as the property (Resources/emailSender/Properties/Code) is a string

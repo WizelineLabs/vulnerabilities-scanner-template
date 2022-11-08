@@ -34,6 +34,15 @@
       ```
 
    2. Push your changes
-   3. 
+   3. See the output
+   4. Fix the issue by creating `.cfnlintrc.yml` with the following content:
+
+      ```yml
+      ignore_checks:
+        - W3002 # This code may only work with `package` cli command as the property (Resources/emailSender/Properties/Code) is a string
+      ```
+
+   5. save and push your changes
+   6. lijkhklijo
 
 ## Application Code (Backend on Python)
