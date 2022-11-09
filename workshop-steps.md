@@ -95,6 +95,19 @@
           run: |
             exit `grep -E '^(Failures|Warnings)' cfn_nag.out | awk '{ SUM += $3} END { print SUM }'`
    ```
+   2. Push your changes.
+   3. Check output to identify possible errors. 
+   4. Fix the issue by creating `.trivyignore` with the following content:
+   
+      Reference link: [trivy DS-0002](https://avd.aquasec.com/misconfig/dockerfile/general/avd-ds-0002/)
+
+      ```yml
+      # Running containers with 'root' user can lead to a container escape situation. It is a best practice to run containers as non-root users, which can be done by adding a 'USER' statement to the Dockerfile.
+      DS002
+      ```
+    5. Commit and Push your changes.  
+
+   
 5. *Checkov*: Policy-as-code .
    1. Add the following code to pipeline file created:
    ```yml
