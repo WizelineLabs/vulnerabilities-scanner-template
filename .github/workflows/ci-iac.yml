@@ -88,3 +88,12 @@ jobs:
           # download_external_modules: true # optional: download external terraform modules from public git repositories and terraform registry
           # # log_level: DEBUG # optional: set log level. Default WARNING
           # baseline: cloudformation/.checkov.baseline # optional: Path to a generated baseline file. Will only report results not in the baseline.
+
+  deploy:
+    name: deploy 
+    needs: [checkov,insecure-cf,trivy,lint]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy the thing
+        run: |
+          echo Deploying 🚀
