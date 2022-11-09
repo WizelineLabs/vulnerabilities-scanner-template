@@ -103,7 +103,7 @@
       runs-on: ubuntu-latest
       steps:
         - name: Check out Git repository
-          uses: actions/checkout@v3
+          uses: actions/checkout@
 
         - name: Run Checkov action
           id: checkov
@@ -119,7 +119,19 @@
             # # log_level: DEBUG # optional: set log level. Default WARNING
             # baseline: cloudformation/.checkov.baseline # optional: Path to a generated baseline file. Will only report results not in the baseline.
     ```
-
+  
+6. Add last step to validate all previous steps are completed `[checkov,insecure-cf,trivy,lint]`, if any of those fail it will not complete.
+   1. Add the following code to pipeline file created:
+   ```yml
+    deploy:
+      name: deploy 
+      needs: [checkov,insecure-cf,trivy,lint]
+      runs-on: ubuntu-latest
+      steps:
+        - name: Deploy the thing
+          run: |
+            echo Deploying 🚀
+   ```
 
     
 ## Application Code (Backend on Python)
