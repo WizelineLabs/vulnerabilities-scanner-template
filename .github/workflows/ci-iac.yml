@@ -33,7 +33,7 @@ jobs:
       - name: Run Trivy vulnerability scanner in IaC mode
         uses: aquasecurity/trivy-action@master
         with:
-          scan-type: 'config'
+          scan-type: 'configore'
           hide-progress: false
           format: 'table'
           exit-code: '1'
@@ -73,7 +73,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out Git repository
-        uses: actions/checkout@
+        uses: actions/checkout@v3
 
       - name: Run Checkov action
         id: checkov
