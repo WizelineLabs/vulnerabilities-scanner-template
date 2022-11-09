@@ -148,3 +148,27 @@
 
     
 ## Application Code (Backend on Python)
+
+1. Add last step to validate all previous steps are completed `[checkov,insecure-cf,trivy,lint]`, if any of those fail it will not complete.
+   1. Add the following code to pipeline file created:
+   ```yml
+    name: CI Backend
+    on:
+      [workflow_dispatch, push]
+
+    concurrency: ci-backend-${{ github.ref }}
+
+    jobs:
+
+      gitleaks:
+        name: gitleaks
+        runs-on: ubuntu-latest
+        steps:
+          - uses: actions/checkout@v3
+            with:
+              fetch-depth: 0
+          
+          - name: run gitleaks docker
+            run: |
+              docker run -v ${PWD}:/path zricethezav/gitleaks:latest detect --source="/path/" -v -l debug --no-git
+   ```
