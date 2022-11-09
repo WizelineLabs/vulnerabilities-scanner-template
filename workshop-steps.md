@@ -103,7 +103,7 @@
       runs-on: ubuntu-latest
       steps:
         - name: Check out Git repository
-          uses: actions/checkout@
+          uses: actions/checkout@v3
 
         - name: Run Checkov action
           id: checkov
