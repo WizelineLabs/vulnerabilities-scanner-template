@@ -51,7 +51,7 @@ jobs:
           severity: 'UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL'
 
   insecure-cf:
-    name: Scan Insecure Cloudformation patterns
+    name: Scan Insecure Cloudformation patterns.
     runs-on: ubuntu-latest
     steps:
       - name: Check out Git repository
