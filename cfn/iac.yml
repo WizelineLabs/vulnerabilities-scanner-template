@@ -31,7 +31,7 @@ Parameters:
 
   VPCId: 
     Type: String
-    Description: VPC Id 
+    Description: VPC Id
 
 Resources:
   calendarLambda:

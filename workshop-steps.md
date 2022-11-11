@@ -149,7 +149,7 @@
     
 ## Application Code (Backend on Python)
 
-1. Add last step to validate all previous steps are completed `[checkov,insecure-cf,trivy,lint]`, if any of those fail it will not complete.
+1. Add Gitleaks docker execution. This tool helps in detecting and preventing hardcoded secrets like passwords, api keys, and tokens in git.
    1. Add the following code to pipeline file created:
    ```yml
     name: CI Backend
@@ -171,4 +171,34 @@
           - name: run gitleaks docker
             run: |
               docker run -v ${PWD}:/path zricethezav/gitleaks:latest detect --source="/path/" -v -l debug --no-git
+   ```
+2. Run unit test and add pytest coverage on PR.:
+   ```yml
+    unit-tests-and-coverage:
+      name: Tests and coverage
+      runs-on: ubuntu-latest
+      needs: [gitleaks]
+      env:
+        FLASK_ENV: development
+      steps:
+        - name: checkout git repository
+          uses: actions/checkout@v3
+
+        - name: Setup Python 3.8
+          uses: actions/setup-python@v3
+          with:
+            python-version: "3.8"
+
+        - name: Install dependencies
+          run: pip install -r requirements.txt
+
+        # - name: Execute unit tests and generate coverage file
+        #   run: |
+        #     bash ./scripts/run_test.sh
+
+
+        - name: Comment coverage
+          uses: coroo/pytest-coverage-commentator@v1.0.2
+          with:
+            pytest-coverage: pytest-coverage.txt   
    ```

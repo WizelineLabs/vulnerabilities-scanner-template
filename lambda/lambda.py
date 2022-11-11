@@ -2,6 +2,9 @@
 import os
 import boto3
 
+password="54564dskjahfds"
+key="saasdasdas"
+
 IS_DEPLOYMENT = os.environ["ENVIRONMENT"] in ["prd", "stg", "sandbox"]
 region_name = os.environ.get("REGION", "us-east-1")
 
@@ -14,7 +17,7 @@ def get_logs_client():
         return boto3.client(
             "logs",
             aws_access_key_id="test",
-            aws_secret_access_key="test",
+            aws_secret_access_key="test",            
             region_name=region_name,
             endpoint_url="http://localhost:4566",
         )
