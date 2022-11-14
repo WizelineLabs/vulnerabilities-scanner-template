@@ -172,6 +172,12 @@
             run: |
               docker run -v ${PWD}:/path zricethezav/gitleaks:latest detect --source="/path/" -v -l debug --no-git
    ```
+   1. Push your changes.
+   2. Check output to identify possible errors. 
+   3. Fix the issue based on gitleaks results, check for parameters found: Finding, Secret,File,Line.
+   4. Push your changes and validate outputs.
+
+
 2. Run unit test and add pytest coverage on PR.:
    ```yml
     unit-tests-and-coverage:
@@ -202,3 +208,5 @@
           with:
             pytest-coverage: pytest-coverage.txt   
    ```
+
+ 

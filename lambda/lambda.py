@@ -2,11 +2,11 @@
 import os
 import boto3
 
-password="54564dskjahfds"
-key="saasdasdas"
-
 IS_DEPLOYMENT = os.environ["ENVIRONMENT"] in ["prd", "stg", "sandbox"]
 region_name = os.environ.get("REGION", "us-east-1")
+
+
+#token= "22lyl_8yoba93u0__1e7l70ft-6jnjv2"
 
 def get_logs_client():
     """Get AWS logs client either local or real"""

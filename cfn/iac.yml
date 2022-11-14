@@ -1,6 +1,7 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: Infra as Code
 Parameters:
+
   AthenaCalendarDB:
     Type: String
     # Default: MSP-Workgroup
@@ -71,5 +72,5 @@ Resources:
         Ref: PublicAlbSecurityGroup
       IpProtocol: tcp
       ToPort: 80
-      Description: "too wide open group"
+      Description: "password too wide open group"
     Type: AWS::EC2::SecurityGroupIngress
