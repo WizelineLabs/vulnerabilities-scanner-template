@@ -179,7 +179,8 @@
    4. Push your changes and validate outputs.
 
 
-2. Run unit test and add pytest coverage on PR.:
+2. Copy `/tests` directory to repo.
+3. Run unit test and add pytest coverage on PR.:
    ```yml
     unit-tests-and-coverage:
       name: Tests and coverage
