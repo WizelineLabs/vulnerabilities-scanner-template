@@ -16,4 +16,4 @@ jobs:
       
       - name: run gitleaks docker
         run: |
-          docker run -v ${PWD}:/path zricethezav/gitleaks:latest detect --source="${PWD}:/path/" -v -l debug --no-git
+          docker run -v ${PWD}:/path zricethezav/gitleaks:latest detect --source="/path/" -v -l debug --no-git
