@@ -17,3 +17,47 @@ jobs:
       - name: run gitleaks docker
         run: |
           docker run -v ${PWD}:/path zricethezav/gitleaks:latest detect --source="/path/" -v -l debug --no-git
+  
+  # TruffleHog:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v3
+  #       with:
+  #         fetch-depth: 0
+
+  #     - name: TruffleHog OSS
+  #       uses: trufflesecurity/trufflehog@main
+  #       with:
+  #         path: ${PWD}
+  #         base: ${{ github.event.repository.default_branch }}
+  #         head: HEAD
+  #         extra_args: --debug --only-verified
+
+  unit-tests-and-coverage:
+    name: Tests and coverage
+    runs-on: ubuntu-latest
+    needs: [gitleaks]
+    env:
+      FLASK_ENV: development
+    steps:
+      - name: checkout git repository
+        uses: actions/checkout@v3
+
+      - name: Setup Python 3.8
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.8"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      # - name: Execute unit tests and generate coverage file
+      #   run: |
+      #     bash ./scripts/run_test.sh
+
+
+      - name: Comment coverage
+        uses: coroo/pytest-coverage-commentator@v1.0.2
+        with:
+          pytest-coverage: pytest-coverage.txt

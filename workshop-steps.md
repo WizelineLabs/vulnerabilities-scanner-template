@@ -175,6 +175,7 @@
    1. Push your changes.
    2. Check output to identify possible errors. 
    3. Fix the issue based on gitleaks results, check for parameters found: Finding, Secret,File,Line.
+   ![gitleaks results](img/2022-11-14-11-37-41.png)
    4. Push your changes and validate outputs.
 
 
