@@ -172,16 +172,16 @@
             run: |
               docker run -v ${PWD}:/path zricethezav/gitleaks:latest detect --source="/path/" -v -l debug --no-git
    ```
-   1. Push your changes.
-   2. Check output to identify possible errors. 
-   3. Fix the issue based on gitleaks results, check for parameters found: Finding, Secret,File,Line.
+   2. Push your changes.
+   3. Check output to identify possible errors. 
+   4. Fix the issue based on gitleaks results, check for parameters found: *Finding*,*Secret*,*File*,*Line*.
    ![gitleaks results](img/2022-11-14-11-37-41.png)
-   4. Push your changes and validate outputs.
+   5. Push your changes and validate outputs.
 
 
 2. Copy `/tests` directory to repo.
 3. add `pylintrc` to repo structure
-4. Run unit test and add pytest coverage on PR.:
+4. Run unit test and add pytest coverage on PR:
    ```yml
     unit-tests-and-coverage:
       name: Tests and coverage
@@ -211,5 +211,34 @@
           with:
             pytest-coverage: pytest-coverage.txt   
    ```
-   1. Add the following code to pipeline file created:
- 
+5. Let's Lint test our code again, add the below job to `ci-backend.yml` file:
+   ```yml
+    lint:
+      name: Lint
+      runs-on: ubuntu-latest
+      #env:
+      needs: [gitleaks]
+      #  FLASK_ENV: development
+      steps:
+        - name: checkout git repository
+          uses: actions/checkout@v3
+
+        - name: Setup Python 3.8
+          uses: actions/setup-python@v3
+          with:
+            python-version: "3.8"
+
+        - name: Install dependencies
+          run: pip install -r requirements.txt
+
+        - name: Lint
+          run: pylint ./lambda/*.py
+
+   ```
+   1. Check output to identify possible errors. 
+   ![Lint results](img/2022-11-14-7-41-55.png)
+   2. Fix the issue by removing Trailing whitespace and (# fix for positional arguments: prepend _) on `lambda.py`:
+   ```yml
+    def lambda_handler(_event,_context):
+        """Lambda handler or main"""
+   ```

@@ -14,13 +14,13 @@ def get_logs_client():
         return boto3.client(
             "logs",
             aws_access_key_id="test",
-            aws_secret_access_key="test",            
+            aws_secret_access_key="test",
             region_name=region_name,
             endpoint_url="http://localhost:4566",
         )
 
 
-def lambda_handler(event, context):
+def lambda_handler(_event,_context):
     """Lambda handler or main"""
 
     retention_days = int(os.environ.get("RETENTION_DAYS", "545"))
