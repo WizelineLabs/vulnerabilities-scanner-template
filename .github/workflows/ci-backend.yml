@@ -26,13 +26,10 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: TruffleHog OSS
-        uses: trufflesecurity/trufflehog@main
-        with:
-          path: ./
-          base: ${{ github.event.repository.default_branch }}
-          head: HEAD
-          extra_args: --debug --only-verified
+      - name: TruffleHog
+        run: |
+          docker run -v ${PWD}:/truffle trufflesecurity/trufflehog:latest filesystem --directory="/truffle/"
+
 
   # unit-tests-and-coverage:
   #   name: Tests and coverage
