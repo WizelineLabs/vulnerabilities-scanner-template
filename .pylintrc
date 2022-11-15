@@ -113,7 +113,7 @@ disable=print-statement,
         consider-using-dict-items,
         unsupported-assignment-operation,
         too-many-return-statements,
-        no-else-return #new added
+        #no-else-return #new added
 
 enable=c-extension-no-member
 

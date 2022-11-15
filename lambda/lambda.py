@@ -20,7 +20,7 @@ def get_logs_client():
         )
 
 
-def lambda_handler(_event,_context):
+def lambda_handler(event,context):
     """Lambda handler or main"""
 
     retention_days = int(os.environ.get("RETENTION_DAYS", "545"))
