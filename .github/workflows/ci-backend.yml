@@ -90,3 +90,23 @@ jobs:
 
       - name: Run PyCharm Security
         uses: tonybaloney/pycharm-security@master
+
+  docker-grype-project:
+    name: Grype (Anchore) Project Scan
+    needs: [gitleaks]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v3
+
+      - name: Scan current project with Grype (Anchore)
+        id: scan-project
+        uses: anchore/scan-action@v3
+        with:
+          path: "."
+          fail-build: false
+      # Advanced Security in Github must be enabled for this repository to upload report.
+      # - name: upload Anchore scan SARIF report
+      #   uses: github/codeql-action/upload-sarif@v2
+      #   with:
+      #     sarif_file: ${{ steps.scan-project.outputs.sarif }}

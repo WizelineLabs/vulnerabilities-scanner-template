@@ -145,8 +145,8 @@
           run: |
             echo Deploying 🚀
    ```
+<br/>
 
-    
 ## Application Code (Backend on Python)
 
 1. Add Gitleaks docker execution. This tool helps in detecting and preventing hardcoded secrets like passwords, api keys, and tokens in git.
@@ -177,8 +177,8 @@
    4. Fix the issue based on gitleaks results, check for parameters found: *Finding*,*Secret*,*File*,*Line*.
    ![gitleaks results](img/2022-11-14-11-37-41.png)
    5. Push your changes and validate outputs.
-
-
+<br/>
+<br/>
 2. Copy `/tests` directory to repo.
 3. add `pylintrc` to repo structure
 4. Run unit test and add pytest coverage on PR:
@@ -211,6 +211,7 @@
           with:
             pytest-coverage: pytest-coverage.txt   
    ```
+   <br/>
 5. Let's Lint test our code again, add the below job to `ci-backend.yml` file:
    ```yml
     lint:
@@ -237,9 +238,46 @@
    ```
    1. Check output to identify possible errors. 
    ![Lint results](img/2022-11-14-7-41-55.png)
-   ![Lint Result](img/2022-11-14-8-46-31.png)
-   2. Fix the issue by removing Trailing whitespace and (# fix for positional arguments: prepend _) on `lambda.py`:
+   2. Fix the issue by removing Trailing whitespace on `lambda.py`.
+   <br/>
+   <br/>
+
+6. Add Trufflehog job to scan filesystem to discover vulnerabilities.
    ```yml
-    def lambda_handler(_event,_context):
-        """Lambda handler or main"""
+    TruffleHog:
+      runs-on: ubuntu-latest
+      steps:
+        - name: Checkout code
+          uses: actions/checkout@v3
+          with:
+            fetch-depth: 0
+
+        - name: TruffleHog
+          run: |
+            docker run -v ${PWD}:/truffle trufflesecurity/trufflehog:latest filesystem --directory="/truffle/"
    ```
+   1. Check output to identify possible errors. 
+<br/>
+1. Add Grype (Anchore) Project Scan.
+   ```yml
+    docker-grype-project:
+      name: Grype (Anchore) Project Scan
+      needs: [gitleaks]
+      runs-on: ubuntu-latest
+      steps:
+        - name: Check out Git repository
+          uses: actions/checkout@v3
+
+        - name: Scan current project with Grype (Anchore)
+          id: scan-project
+          uses: anchore/scan-action@v3
+          with:
+            path: "."
+            fail-build: false
+        # Advanced Security in Github must be enabled for this repository to upload report.
+        # - name: upload Anchore scan SARIF report
+        #   uses: github/codeql-action/upload-sarif@v2
+        #   with:
+        #     sarif_file: ${{ steps.scan-project.outputs.sarif }}
+   ```
+
