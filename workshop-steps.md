@@ -180,7 +180,8 @@
 
 
 2. Copy `/tests` directory to repo.
-3. Run unit test and add pytest coverage on PR.:
+3. add `pylintrc` to repo structure
+4. Run unit test and add pytest coverage on PR.:
    ```yml
     unit-tests-and-coverage:
       name: Tests and coverage
@@ -210,5 +211,5 @@
           with:
             pytest-coverage: pytest-coverage.txt   
    ```
-
+   1. Add the following code to pipeline file created:
  
