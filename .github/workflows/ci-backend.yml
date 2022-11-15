@@ -61,3 +61,24 @@ jobs:
         uses: coroo/pytest-coverage-commentator@v1.0.2
         with:
           pytest-coverage: pytest-coverage.txt
+        
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    #env:
+    needs: [gitleaks]
+    #  FLASK_ENV: development
+    steps:
+      - name: checkout git repository
+        uses: actions/checkout@v3
+
+      - name: Setup Python 3.8
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.8"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Lint
+        run: pylint ./lambda/*.py
