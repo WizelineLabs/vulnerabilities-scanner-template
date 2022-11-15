@@ -179,39 +179,8 @@
    5. Push your changes and validate outputs.
 <br/>
 <br/>
-2. Copy `/tests` directory to repo.
 3. add `pylintrc` to repo structure
-4. Run unit test and add pytest coverage on PR:
-   ```yml
-    unit-tests-and-coverage:
-      name: Tests and coverage
-      runs-on: ubuntu-latest
-      needs: [gitleaks]
-      env:
-        FLASK_ENV: development
-      steps:
-        - name: checkout git repository
-          uses: actions/checkout@v3
 
-        - name: Setup Python 3.8
-          uses: actions/setup-python@v3
-          with:
-            python-version: "3.8"
-
-        - name: Install dependencies
-          run: pip install -r requirements.txt
-
-        # - name: Execute unit tests and generate coverage file
-        #   run: |
-        #     bash ./scripts/run_test.sh
-
-
-        - name: Comment coverage
-          uses: coroo/pytest-coverage-commentator@v1.0.2
-          with:
-            pytest-coverage: pytest-coverage.txt   
-   ```
-   <br/>
 5. Let's Lint test our code again, add the below job to `ci-backend.yml` file:
    ```yml
     lint:
@@ -280,4 +249,6 @@
         #   with:
         #     sarif_file: ${{ steps.scan-project.outputs.sarif }}
    ```
+   1. Check output to identify possible errors.
+   2. Since severity level is c
 
