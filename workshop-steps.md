@@ -237,6 +237,7 @@
    ```
    1. Check output to identify possible errors. 
    ![Lint results](img/2022-11-14-7-41-55.png)
+   ![Lint Result](img/2022-11-14-8-46-31.png)
    2. Fix the issue by removing Trailing whitespace and (# fix for positional arguments: prepend _) on `lambda.py`:
    ```yml
     def lambda_handler(_event,_context):
