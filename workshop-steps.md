@@ -179,9 +179,9 @@
    5. Push your changes and validate outputs.
 <br/>
 <br/>
-3. add `pylintrc` to repo structure
+2. add `pylintrc` to repo structure.
 
-5. Let's Lint test our code again, add the below job to `ci-backend.yml` file:
+3. Let's run a Lint test to our code again, add the below job to `ci-backend.yml` file:
    ```yml
     lint:
       name: Lint
@@ -210,8 +210,20 @@
    2. Fix the issue by removing Trailing whitespace on `lambda.py`.
    <br/>
    <br/>
+4. Lets run a security check to our repo.
+   ```yml
+    security-checks:
+      runs-on: ubuntu-latest
+      needs: [gitleaks]
+      name: Pycharm-security check
+      steps:
+        - name: checkout git repository
+          uses: actions/checkout@v3
 
-6. Add Trufflehog job to scan filesystem to discover vulnerabilities.
+        - name: Run PyCharm Security
+          uses: tonybaloney/pycharm-security@master
+   ```
+5. Add Trufflehog job to scan filesystem to discover vulnerabilities.
    ```yml
     TruffleHog:
       runs-on: ubuntu-latest
