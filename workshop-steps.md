@@ -262,5 +262,53 @@
         #     sarif_file: ${{ steps.scan-project.outputs.sarif }}
    ```
    1. Check output to identify possible errors.
-   2. Since severity level is c
+   2. Change fail-build parameter to true
+   3. Save and push your changes
+2. Add docker build job:
+   ```yml
+    docker-build:
+      name: Build Docker image
+      outputs:
+        full_docker_image_tag: ${{ steps.build_image.outputs.full_docker_image_tag }}
+        image_tag: ${{ steps.build_image.outputs.image_tag }}
+      runs-on: ubuntu-latest
+      needs: [security-checks, unit-tests-and-coverage, lint, docker-grype-project]
+      steps:
+        - name: Check out Git repository
+          uses: actions/checkout@v3
+
+        - name: Add SHORT_SHA and BRANCH_TAG env variables
+          run: |
+            echo "SHORT_SHA=`echo ${GITHUB_SHA} | cut -c1-8`" >> $GITHUB_ENV
+            echo "BRANCH_TAG=`echo ${GITHUB_REF##*/}`" >> $GITHUB_ENV
+
+        - name: Set IMAGE_TAG env variable
+          run: |
+            echo "IMAGE_TAG=`echo ${BRANCH_TAG}-${SHORT_SHA}`" >> $GITHUB_ENV
+
+        - name: Build and tag image
+          id: build_image
+          env:
+            REGISTRY: ghcr.io
+            IMAGE_NAME: ${{ github.repository }}
+            ECR_REPOSITORY: ${{ github.repository }}
+            IMAGE_TAG: ${{ env.IMAGE_TAG }}
+          run: |
+            echo REGISTRY: $REGISTRY
+            echo ECR_REPOSITORY: $ECR_REPOSITORY
+            echo IMAGE_TAG: $IMAGE_TAG
+            echo "Building and tagging $REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ..."
+            docker build -t $REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f Dockerfile .
+            mkdir -p /tmp
+            docker save "$REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" > /tmp/docker-image.tar
+            echo "full_docker_image_tag=$REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+            echo "image_tag=$IMAGE_TAG" >> $GITHUB_OUTPUT
+
+        - name: Upload artifact
+          uses: actions/upload-artifact@v2
+          with:
+            name: docker-image
+            path: /tmp/docker-image.tar
+            retention-days: 1
+   ```
 
