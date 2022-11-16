@@ -67,10 +67,10 @@ Resources:
   PublicAlbSecurityGroupHttpIngress:
     Properties:
       CidrIp: 0.0.0.0/0
-      FromPort: 80
+      FromPort: 22
       GroupId:
         Ref: PublicAlbSecurityGroup
       IpProtocol: tcp
-      ToPort: 80
+      ToPort: 22
       Description: "password too wide open group"
     Type: AWS::EC2::SecurityGroupIngress
