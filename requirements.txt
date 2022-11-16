@@ -27,6 +27,6 @@ PyYAML==6.0
 s3transfer==0.5.2
 six==1.16.0
 toml==0.10.2
-urllib3==1.26.5 #changed from 8 to 5 on last digit
+urllib3==1.26.8 #changed from 8 to 5 on last digit
 virtualenv==20.13.2
 wrapt==1.12.1
