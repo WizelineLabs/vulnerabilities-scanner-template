@@ -14,7 +14,7 @@ def get_logs_client():
             return boto3.client(
                 "logs",
                 aws_access_key_id="test",
-                aws_secret_access_key="test", #token= "22lyl_8yoba93u0__1e7l70ft-6jnjv2"
+                aws_secret_access_key="test",
                 region_name=region_name,
                 endpoint_url="http://localhost:4566",
             )
