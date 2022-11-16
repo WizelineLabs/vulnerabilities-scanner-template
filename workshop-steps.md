@@ -192,202 +192,229 @@
    5. Push your changes and validate outputs.
 <br/>
 <br/>
-2. Lets add the folloadd `pylintrc` to repo structure.
 
-3. Let's run a Lint test to our code again, add the below job to `ci-backend.yml` file:
-   ```yml
-    lint:
-      name: Lint
-      runs-on: ubuntu-latest
-      #env:
-      needs: [gitleaks]
-      #  FLASK_ENV: development
-      steps:
-        - name: checkout git repository
-          uses: actions/checkout@v3
+2. Lets add file `.pylintrc` to repo structure and move on the warnings showed on outputs.
+   ![Lint results](img/2022-11-16-2-34-14.png)
+   2. This time we will wait to complete step #3 to push our changes.
 
-        - name: Setup Python 3.8
-          uses: actions/setup-python@v3
-          with:
-            python-version: "3.8"
+3. Let's run a Lint test to our code again, add the below job to `ci-backend.yml` file.
+   1. Add following code:
+      ```yml
+      lint:
+        name: Lint
+        runs-on: ubuntu-latest
+        #env:
+        needs: [gitleaks]
+        #  FLASK_ENV: development
+        steps:
+          - name: checkout git repository
+            uses: actions/checkout@v3
 
-        - name: Install dependencies
-          run: pip install -r requirements.txt
+          - name: Setup Python 3.8
+            uses: actions/setup-python@v3
+            with:
+              python-version: "3.8"
 
-        - name: Lint
-          run: pylint ./lambda/*.py
+          - name: Install dependencies
+            run: pip install -r requirements.txt
 
-   ```
-   1. Check output to identify possible errors. 
+          - name: Lint
+            run: pylint ./lambda/*.py
+      ```
+   2. Check output to identify possible errors.
    ![Lint results](img/2022-11-14-7-41-55.png)
-   2. Fix the issue by removing Trailing whitespace on `lambda.py`.
+   1. Fix the issue by removing Trailing whitespace on `lambda.py`.
    <br/>
    <br/>
-4. Lets run a security check to our repo.
-   ```yml
-    security-checks:
-      runs-on: ubuntu-latest
-      needs: [gitleaks]
-      name: Pycharm-security check
-      steps:
-        - name: checkout git repository
-          uses: actions/checkout@v3
+4. Lets run a security check to our repository by using PyCharm Security.
+   1. Add the bellow code to the `ci-backend.yml` file:
+      ```yml
+      security-checks:
+        runs-on: ubuntu-latest
+        needs: [gitleaks]
+        name: Pycharm-security check
+        steps:
+          - name: checkout git repository
+            uses: actions/checkout@v3
 
-        - name: Run PyCharm Security
-          uses: tonybaloney/pycharm-security@master
-   ```
-5. Add Trufflehog job to scan filesystem to discover vulnerabilities.
-   ```yml
-    TruffleHog:
-      runs-on: ubuntu-latest
-      steps:
-        - name: Checkout code
-          uses: actions/checkout@v3
-          with:
-            fetch-depth: 0
-
-        - name: TruffleHog
-          run: |
-            docker run -v ${PWD}:/truffle trufflesecurity/trufflehog:latest filesystem --directory="/truffle/"
-   ```
-   1. Check output to identify possible errors. 
+          - name: Run PyCharm Security
+            uses: tonybaloney/pycharm-security@master
+      ```
+    1. Save and Push your changes.
+    2. Check on outputs on Pycharm-security check
+   ![Pycharm results](img/2022-11-16-2-48-13.png)
+    1. **Missing steps to cover asserts warinings??**********
 <br/>
-6. **do we need to include grype without report??** Add Grype (Anchore) Project Scan.
-    ```yml
-    docker-grype-project:
-      name: Grype (Anchore) Project Scan
-      needs: [gitleaks]
-      runs-on: ubuntu-latest
-      steps:
-        - name: Check out Git repository
-          uses: actions/checkout@v3
+<br/>
 
-        - name: Scan current project with Grype (Anchore)
-          id: scan-project
-          uses: anchore/scan-action@v3
-          with:
-            path: "."
-            fail-build: false
-        # Advanced Security in Github must be enabled for this repository to upload report.
-        # - name: upload Anchore scan SARIF report
-        #   uses: github/codeql-action/upload-sarif@v2
-        #   with:
-        #     sarif_file: ${{ steps.scan-project.outputs.sarif }}
-    ```
-   1. Check output to identify possible errors.
-   2. Change fail-build parameter to true
+5. Add Trufflehog job to scan filesystem to discover vulnerabilities.
+   1. Add the bellow code to the `ci-backend.yml` file:
+      ```yml
+        TruffleHog:
+          runs-on: ubuntu-latest
+          steps:
+            - name: Checkout code
+              uses: actions/checkout@v3
+              with:
+                fetch-depth: 0
+
+            - name: TruffleHog
+              run: |
+                docker run -v ${PWD}:/truffle trufflesecurity/trufflehog:latest filesystem --directory="/truffle/"
+      ```
+   2. Check output to identify possible errors. 
+<br/>
+<br/>
+
+6. **do we need to include grype without report??*********** Add Grype (Anchore) Project Scan.
+   1. Add the bellow code to the `ci-backend.yml` file:
+      ```yml
+      docker-grype-project:
+        name: Grype (Anchore) Project Scan
+        needs: [gitleaks]
+        runs-on: ubuntu-latest
+        steps:
+          - name: Check out Git repository
+            uses: actions/checkout@v3
+
+          - name: Scan current project with Grype (Anchore)
+            id: scan-project
+            uses: anchore/scan-action@v3
+            with:
+              path: "."
+              fail-build: false
+          # Advanced Security in Github must be enabled for this repository to upload report.
+          # - name: upload Anchore scan SARIF report
+          #   uses: github/codeql-action/upload-sarif@v2
+          #   with:
+          #     sarif_file: ${{ steps.scan-project.outputs.sarif }}
+      ```
+   2. Check output to identify possible errors.
    3. Save and push your changes
    <br/>
    <br/>
-7. Add docker build job:
-   ```yml
-    docker-build:
-      name: Build Docker image
-      outputs:
-        full_docker_image_tag: ${{ steps.build_image.outputs.full_docker_image_tag }}
-        image_tag: ${{ steps.build_image.outputs.image_tag }}
-      runs-on: ubuntu-latest
-      needs: [security-checks, unit-tests-and-coverage, lint, docker-grype-project]
-      steps:
-        - name: Check out Git repository
-          uses: actions/checkout@v3
-
-        - name: Add SHORT_SHA and BRANCH_TAG env variables
-          run: |
-            echo "SHORT_SHA=`echo ${GITHUB_SHA} | cut -c1-8`" >> $GITHUB_ENV
-            echo "BRANCH_TAG=`echo ${GITHUB_REF##*/}`" >> $GITHUB_ENV
-
-        - name: Set IMAGE_TAG env variable
-          run: |
-            echo "IMAGE_TAG=`echo ${BRANCH_TAG}-${SHORT_SHA}`" >> $GITHUB_ENV
-
-        - name: Build and tag image
-          id: build_image
-          env:
-            REGISTRY: ghcr.io
-            IMAGE_NAME: ${{ github.repository }}
-            ECR_REPOSITORY: ${{ github.repository }}
-            IMAGE_TAG: ${{ env.IMAGE_TAG }}
-          run: |
-            echo REGISTRY: $REGISTRY
-            echo ECR_REPOSITORY: $ECR_REPOSITORY
-            echo IMAGE_TAG: $IMAGE_TAG
-            echo "Building and tagging $REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ..."
-            docker build -t $REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f Dockerfile .
-            mkdir -p /tmp
-            docker save "$REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" > /tmp/docker-image.tar
-            echo "full_docker_image_tag=$REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
-            echo "image_tag=$IMAGE_TAG" >> $GITHUB_OUTPUT
-
-        - name: Upload artifact
-          uses: actions/upload-artifact@v2
-          with:
-            name: docker-image
-            path: /tmp/docker-image.tar
-            retention-days: 1
-   ```
-8. Lets scan our Docker image for vulnerabilities, add *Docker-trivy-vul* job to pipeline.
-  ```yml
-  docker-trivy-vuln:
-    name: Trivy vulnerability scanner
-    runs-on: ubuntu-latest
-    needs: [docker-build]
-    steps:
-      - name: Download artifact
-        uses: actions/download-artifact@v3
-        with:
-          name: docker-image
-          path: /tmp
-      - name: Load Docker image
-        run: |
-          docker load --input /tmp/docker-image.tar
-
-      - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@master
-        with:
-          image-ref: "${{ needs.docker-build.outputs.full_docker_image_tag }}"
-          format: "template"
-          template: "@/contrib/sarif.tpl"
-          output: "trivy-results.sarif"
-          exit-code: "0"
-          ignore-unfixed: true
-          vuln-type: "os,library"
-          severity: "UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL"
-  ```
-9.  Lets invoke our vulnerability scanner for container images - Grype:
-    1.  Add below code to our `ci-backend.yml` file:
-   ```yml
-    docker-grype:
-      name: Grype (Anchore) Docker Scan
-      runs-on: ubuntu-latest
-      needs: [docker-build]
-      steps:
-        - name: Download artifact
-          uses: actions/download-artifact@v2
-          with:
-            name: docker-image
-            path: /tmp
-
-        - name: Load Docker image
-          run: |
-            docker load --input /tmp/docker-image.tar
-
-        - name: Scan image wih Grype (Anchore)
-          id: scan-image
-          uses: anchore/scan-action@v3
-          with:
-            image: "${{ needs.docker-build.outputs.full_docker_image_tag }}"
-            fail-build: false
-   ```
-11. Add final step which depends on previous security scans in order to complete:
-    ```yml
-      deploy:
-        name: Push 
+7. Now, lets create our Docker image.
+   1. Add docker build job code to `ci-backend.yml` file:
+      ```yml
+      docker-build:
+        name: Build Docker image
+        outputs:
+          full_docker_image_tag: ${{ steps.build_image.outputs.full_docker_image_tag }}
+          image_tag: ${{ steps.build_image.outputs.image_tag }}
         runs-on: ubuntu-latest
-        needs: [docker-grype,docker-trivy-vuln]
+        needs: [security-checks, unit-tests-and-coverage, lint, docker-grype-project]
         steps:
-          - name: Deploy the thing
+          - name: Check out Git repository
+            uses: actions/checkout@v3
+
+          - name: Add SHORT_SHA and BRANCH_TAG env variables
             run: |
-              echo Deploying 🚀
-    ```
-12. Happy deploy... 🚀
+              echo "SHORT_SHA=`echo ${GITHUB_SHA} | cut -c1-8`" >> $GITHUB_ENV
+              echo "BRANCH_TAG=`echo ${GITHUB_REF##*/}`" >> $GITHUB_ENV
+
+          - name: Set IMAGE_TAG env variable
+            run: |
+              echo "IMAGE_TAG=`echo ${BRANCH_TAG}-${SHORT_SHA}`" >> $GITHUB_ENV
+
+          - name: Build and tag image
+            id: build_image
+            env:
+              REGISTRY: ghcr.io
+              IMAGE_NAME: ${{ github.repository }}
+              ECR_REPOSITORY: ${{ github.repository }}
+              IMAGE_TAG: ${{ env.IMAGE_TAG }}
+            run: |
+              echo REGISTRY: $REGISTRY
+              echo ECR_REPOSITORY: $ECR_REPOSITORY
+              echo IMAGE_TAG: $IMAGE_TAG
+              echo "Building and tagging $REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ..."
+              docker build -t $REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f Dockerfile .
+              mkdir -p /tmp
+              docker save "$REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" > /tmp/docker-image.tar
+              echo "full_docker_image_tag=$REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+              echo "image_tag=$IMAGE_TAG" >> $GITHUB_OUTPUT
+
+          - name: Upload artifact
+            uses: actions/upload-artifact@v2
+            with:
+              name: docker-image
+              path: /tmp/docker-image.tar
+              retention-days: 1
+      ```
+8. Lets scan our Docker image for vulnerabilities, add *Docker-trivy-vul* job to pipeline.
+   1. Add docker trivy job to `ci-backend.yml` file:
+      ```yml
+      docker-trivy-vuln:
+        name: Trivy vulnerability scanner
+        runs-on: ubuntu-latest
+        needs: [docker-build]
+        steps:
+          - name: Download artifact
+            uses: actions/download-artifact@v3
+            with:
+              name: docker-image
+              path: /tmp
+          - name: Load Docker image
+            run: |
+              docker load --input /tmp/docker-image.tar
+
+          - name: Run Trivy vulnerability scanner
+            uses: aquasecurity/trivy-action@master
+            with:
+              image-ref: "${{ needs.docker-build.outputs.full_docker_image_tag }}"
+              format: "template"
+              template: "@/contrib/sarif.tpl"
+              output: "trivy-results.sarif"
+              exit-code: "0"
+              ignore-unfixed: true
+              vuln-type: "os,library"
+              severity: "UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL"
+      ```
+    2. Push your changes.
+    3. If no issues, let's continue.
+<br/>
+<br/>
+
+9. Lets invoke our vulnerability scanner for container images - *Grype*:
+    1.  Add below code to our `ci-backend.yml` file:
+        ```yml
+          docker-grype:
+            name: Grype (Anchore) Docker Scan
+            runs-on: ubuntu-latest
+            needs: [docker-build]
+            steps:
+              - name: Download artifact
+                uses: actions/download-artifact@v2
+                with:
+                  name: docker-image
+                  path: /tmp
+
+              - name: Load Docker image
+                run: |
+                  docker load --input /tmp/docker-image.tar
+
+              - name: Scan image wih Grype (Anchore)
+                id: scan-image
+                uses: anchore/scan-action@v3
+                with:
+                  image: "${{ needs.docker-build.outputs.full_docker_image_tag }}"
+                  fail-build: false
+        ```
+    2. Push your changes.
+    3. If no issues, let's continue.
+<br/>
+<br/>
+
+1.  Our final step is a validation job which depends on previous security scans in order to complete:
+    1. Add the below job and push your changes:
+      ```yml
+        deploy:
+          name: Push 
+          runs-on: ubuntu-latest
+          needs: [docker-grype,docker-trivy-vuln]
+          steps:
+            - name: Deploy the thing
+              run: |
+                echo Deploying 🚀
+      ```
+2.  Happy deploy... 🚀
