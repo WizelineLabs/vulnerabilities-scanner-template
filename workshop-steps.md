@@ -192,7 +192,7 @@
    5. Push your changes and validate outputs.
 <br/>
 <br/>
-2. add `pylintrc` to repo structure.
+2. Lets add the folloadd `pylintrc` to repo structure.
 
 3. Let's run a Lint test to our code again, add the below job to `ci-backend.yml` file:
    ```yml
