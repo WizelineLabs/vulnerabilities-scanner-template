@@ -1,6 +1,12 @@
 """Set retention configuration for log groups with missing retention configuration"""
 import os
 import boto3
+import requests
+
+params = {'p': '9431'}
+response = requests.get('https://pythonexamples.org/',
+            params=params)
+print(response.url)
 
 IS_DEPLOYMENT = os.environ["ENVIRONMENT"] in ["prd", "stg", "sandbox"]
 region_name = os.environ.get("REGION", "us-east-1")
