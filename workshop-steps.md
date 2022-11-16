@@ -337,3 +337,15 @@
             image: "${{ needs.docker-build.outputs.full_docker_image_tag }}"
             fail-build: false
    ```
+9. Add final step which depends on previous security scans in order to complete:
+    ```yml
+      deploy:
+        name: Push 
+        runs-on: ubuntu-latest
+        needs: [docker-grype,docker-trivy-vuln]
+        steps:
+          - name: Deploy the thing
+            run: |
+              echo Deploying 🚀
+    ```
+9. Happy deploy... 🚀
