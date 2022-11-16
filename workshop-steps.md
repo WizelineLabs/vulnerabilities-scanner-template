@@ -46,7 +46,7 @@
    <br/>
    <br/>
 3. Implement Security Scanner: *Aqua Security Trivy*
-      1. Add the following code to pipeline file created:
+   1. Add the following code to our pipeline file created `ci-backend.yml`:
       ```yml
       trivy:
         name: Run Trivy (Iac and fs mode)
@@ -76,30 +76,35 @@
               ignore-unfixed: true
               severity: 'UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL'
       ```
+      2. Save and push your changes.
+      3. Check output for possible vulnerabilities.
+      4. If no errors, let's continue!!.
+   <br/>
+   <br/>
 4. Let's look for patterns in CloudFormation templates that may indicate insecure infrastructure.
    1. Add the following code to pipeline file created:
-   ```yml
-    insecure-cf:
-      name: Scan Insecure Cloudformation patterns
-      runs-on: ubuntu-latest
-      steps:
-        - name: Check out Git repository
-          uses: actions/checkout@v3
+      ```yml
+        insecure-cf:
+          name: Scan Insecure Cloudformation patterns
+          runs-on: ubuntu-latest
+          steps:
+            - name: Check out Git repository
+              uses: actions/checkout@v3
 
-        - name: Insecure Cloudformation patterns
-          uses: stelligent/cfn_nag@master
-          with:
-            input_path: cfn
-            extra_args: --fail-on-warnings --blacklist-path .cfnnagcfg.yml
+            - name: Insecure Cloudformation patterns
+              uses: stelligent/cfn_nag@master
+              with:
+                input_path: cfn
+                extra_args: --fail-on-warnings --blacklist-path .cfnnagcfg.yml
 
-        - name: Fail if cfn_nag scan contains failures, warnings
-          # sum cfn_nag failures, warnigns and return it as exit code
-          run: |
-            exit `grep -E '^(Failures|Warnings)' cfn_nag.out | awk '{ SUM += $3} END { print SUM }'`
-   ```
-   1. Push your changes.
-   2. Check output to identify possible errors. 
-   3. Fix the issue by creating `.trivyignore` with the following content:
+            - name: Fail if cfn_nag scan contains failures, warnings
+              # sum cfn_nag failures, warnigns and return it as exit code
+              run: |
+                exit `grep -E '^(Failures|Warnings)' cfn_nag.out | awk '{ SUM += $3} END { print SUM }'`
+      ```
+   2. Push your changes.
+   3. Check output to identify possible errors. 
+   4. Fix the issue by creating `.trivyignore` at root level of your repo with the following content:
    
       Reference link: [trivy DS-0002](https://avd.aquasec.com/misconfig/dockerfile/general/avd-ds-0002/)
 
@@ -107,73 +112,79 @@
       # Running containers with 'root' user can lead to a container escape situation. It is a best practice to run containers as non-root users, which can be done by adding a 'USER' statement to the Dockerfile.
       DS002
       ```
-    1. Commit and Push your changes.  
+    1. Commit and Push your changes. 
+    2. If no errors, let's continue!!.
+<br/>
+<br/>
 
-   
 5. *Checkov*: Policy-as-code. Scans cloud infrastructure configurations to find misconfigurations.
    1. Add the following code to pipeline file created:
-   ```yml
-    Checkov:
-      name: Checkov - Security Analysis of Cloudformation
-      runs-on: ubuntu-latest
-      steps:
-        - name: Check out Git repository
-          uses: actions/checkout@v3
+      ```yml
+      Checkov:
+        name: Checkov - Security Analysis of Cloudformation
+        runs-on: ubuntu-latest
+        steps:
+          - name: Check out Git repository
+            uses: actions/checkout@v3
 
-        - name: Run Checkov action
-          id: checkov
-          uses: bridgecrewio/checkov-action@master
-          with:
-            directory: cfn/
-            quiet: false # optional: display only failed checks
-            soft_fail: false # optional: do not return an error code if there are failed checks
-            skip_check: CKV_AWS_115,CKV_AWS_116,CKV_AWS_173,CKV_AWS_260
-            # framework: cloudformation # optional: run only on a specific infrastructure {cloudformation,terraform,kubernetes,all}
-            # output_format: json # optional: the output format, one of: cli, json, junitxml, github_failed_only
-            # download_external_modules: true # optional: download external terraform modules from public git repositories and terraform registry
-            # # log_level: DEBUG # optional: set log level. Default WARNING
-            # baseline: cloudformation/.checkov.baseline # optional: Path to a generated baseline file. Will only report results not in the baseline.
-    ```
-  
+          - name: Run Checkov action
+            id: checkov
+            uses: bridgecrewio/checkov-action@master
+            with:
+              directory: cfn/
+              quiet: false # optional: display only failed checks
+              soft_fail: false # optional: do not return an error code if there are failed checks
+              skip_check: CKV_AWS_115,CKV_AWS_116,CKV_AWS_173,CKV_AWS_260
+              # framework: cloudformation # optional: run only on a specific infrastructure {cloudformation,terraform,kubernetes,all}
+              # output_format: json # optional: the output format, one of: cli, json, junitxml, github_failed_only
+              # download_external_modules: true # optional: download external terraform modules from public git repositories and terraform registry
+              # # log_level: DEBUG # optional: set log level. Default WARNING
+              # baseline: cloudformation/.checkov.baseline # optional: Path to a generated baseline file. Will only report results not in the baseline.
+      ```
+    2. Commit and Push your changes. 
+    3. If no errors, let's continue!!.
+<br/>
+<br/>
+
 6. Add last step to validate all previous steps are completed `[checkov,insecure-cf,trivy,lint]`, if any of those fail it will not complete.
    1. Add the following code to pipeline file created:
-   ```yml
-    deploy:
-      name: deploy 
-      needs: [checkov,insecure-cf,trivy,lint]
-      runs-on: ubuntu-latest
-      steps:
-        - name: Deploy the thing
-          run: |
-            echo Deploying 🚀
-   ```
+      ```yml
+        deploy:
+          name: deploy 
+          needs: [checkov,insecure-cf,trivy,lint]
+          runs-on: ubuntu-latest
+          steps:
+            - name: Deploy the thing
+              run: |
+                echo Deploying 🚀
+      ```
 <br/>
 
 ## Application Code (Backend on Python)
 
 1. Add Gitleaks docker execution. This tool helps in detecting and preventing hardcoded secrets like passwords, api keys, and tokens in git.
    1. Add the following code to pipeline file created:
-   ```yml
-    name: CI Backend
-    on:
-      [workflow_dispatch, push]
+      ```yml
+        name: CI Backend
+        on:
+          [workflow_dispatch, push]
 
-    concurrency: ci-backend-${{ github.ref }}
+        concurrency: ci-backend-${{ github.ref }}
 
-    jobs:
+        jobs:
 
-      gitleaks:
-        name: gitleaks
-        runs-on: ubuntu-latest
-        steps:
-          - uses: actions/checkout@v3
-            with:
-              fetch-depth: 0
-          
-          - name: run gitleaks docker
-            run: |
-              docker run -v ${PWD}:/path zricethezav/gitleaks:latest detect --source="/path/" -v -l debug --no-git
-   ```
+          gitleaks:
+            name: gitleaks
+            runs-on: ubuntu-latest
+            steps:
+              - uses: actions/checkout@v3
+                with:
+                  fetch-depth: 0
+              
+              - name: run gitleaks docker
+                run: |
+                  docker run -v ${PWD}:/path zricethezav/gitleaks:latest detect --source="/path/" -v -l debug --no-git
+      ```
    2. Push your changes.
    3. Check output to identify possible errors. 
    4. Fix the issue based on gitleaks results, check for parameters found: *Finding*,*Secret*,*File*,*Line*.
@@ -315,7 +326,36 @@
             path: /tmp/docker-image.tar
             retention-days: 1
    ```
-8. Add Grype docker scan:
+8. Lets scan our Docker image for vulnerabilities, add *Docker-trivy-vul* job to pipeline.
+  ```yml
+  docker-trivy-vuln:
+    name: Trivy vulnerability scanner
+    runs-on: ubuntu-latest
+    needs: [docker-build]
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: docker-image
+          path: /tmp
+      - name: Load Docker image
+        run: |
+          docker load --input /tmp/docker-image.tar
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: "${{ needs.docker-build.outputs.full_docker_image_tag }}"
+          format: "template"
+          template: "@/contrib/sarif.tpl"
+          output: "trivy-results.sarif"
+          exit-code: "0"
+          ignore-unfixed: true
+          vuln-type: "os,library"
+          severity: "UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL"
+  ```
+9.  Lets invoke our vulnerability scanner for container images - Grype:
+    1.  Add below code to our `ci-backend.yml` file:
    ```yml
     docker-grype:
       name: Grype (Anchore) Docker Scan
@@ -339,7 +379,7 @@
             image: "${{ needs.docker-build.outputs.full_docker_image_tag }}"
             fail-build: false
    ```
-9. Add final step which depends on previous security scans in order to complete:
+11. Add final step which depends on previous security scans in order to complete:
     ```yml
       deploy:
         name: Push 
@@ -350,4 +390,4 @@
             run: |
               echo Deploying 🚀
     ```
-9. Happy deploy... 🚀
+12. Happy deploy... 🚀
