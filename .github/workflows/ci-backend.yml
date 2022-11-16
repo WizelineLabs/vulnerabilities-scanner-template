@@ -119,7 +119,7 @@ jobs:
       full_docker_image_tag: ${{ steps.build_image.outputs.full_docker_image_tag }}
       image_tag: ${{ steps.build_image.outputs.image_tag }}
     runs-on: ubuntu-latest
-    needs: [security-checks, unit-tests-and-coverage, lint, docker-grype-project]
+    needs: [security-checks, lint, docker-grype-project]
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v3
