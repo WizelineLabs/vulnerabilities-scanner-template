@@ -239,8 +239,8 @@
    ```
    1. Check output to identify possible errors. 
 <br/>
-1. Add Grype (Anchore) Project Scan.
-   ```yml
+6. **do we need to include grype without report??** Add Grype (Anchore) Project Scan.
+    ```yml
     docker-grype-project:
       name: Grype (Anchore) Project Scan
       needs: [gitleaks]
@@ -260,11 +260,13 @@
         #   uses: github/codeql-action/upload-sarif@v2
         #   with:
         #     sarif_file: ${{ steps.scan-project.outputs.sarif }}
-   ```
+    ```
    1. Check output to identify possible errors.
    2. Change fail-build parameter to true
    3. Save and push your changes
-2. Add docker build job:
+   <br/>
+   <br/>
+7. Add docker build job:
    ```yml
     docker-build:
       name: Build Docker image
@@ -311,4 +313,27 @@
             path: /tmp/docker-image.tar
             retention-days: 1
    ```
+8. Add Grype docker scan:
+   ```yml
+    docker-grype:
+      name: Grype (Anchore) Docker Scan
+      runs-on: ubuntu-latest
+      needs: [docker-build]
+      steps:
+        - name: Download artifact
+          uses: actions/download-artifact@v2
+          with:
+            name: docker-image
+            path: /tmp
 
+        - name: Load Docker image
+          run: |
+            docker load --input /tmp/docker-image.tar
+
+        - name: Scan image wih Grype (Anchore)
+          id: scan-image
+          uses: anchore/scan-action@v3
+          with:
+            image: "${{ needs.docker-build.outputs.full_docker_image_tag }}"
+            fail-build: false
+   ```
