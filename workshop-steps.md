@@ -46,35 +46,35 @@
    <br/>
    <br/>
 3. Implement Security Scanner: *Aqua Security Trivy*
-   1. Add the following code to our pipeline file created `ci-backend.yml`:
+   1. Add the following code to our pipeline file created `ci-iac.yml`:
       ```yml
-      trivy:
-        name: Run Trivy (Iac and fs mode)
-        runs-on: ubuntu-latest
-        steps:
-          - name: Check out Git repository
-            uses: actions/checkout@v3
+        trivy:
+          name: Run Trivy (Iac and fs mode)
+          runs-on: ubuntu-latest
+          steps:
+            - name: Check out Git repository
+              uses: actions/checkout@v3
 
-          # Trivy scans Infrastructure as Code (IaC) Terraform, CloudFormation, Dockerfile and Kubernetes.
-          - name: Run Trivy vulnerability scanner in IaC mode
-            uses: aquasecurity/trivy-action@master
-            with:
-              scan-type: 'config'
-              hide-progress: false
-              format: 'table'
-              exit-code: '1'
-              ignore-unfixed: false
-              severity: 'UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL'
+            # Trivy scans Infrastructure as Code (IaC) Terraform, CloudFormation, Dockerfile and Kubernetes.
+            - name: Run Trivy vulnerability scanner in IaC mode
+              uses: aquasecurity/trivy-action@master
+              with:
+                scan-type: 'config'
+                hide-progress: false
+                format: 'table'
+                exit-code: '1'
+                ignore-unfixed: false
+                severity: 'UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL'
 
-          - name: Run Trivy vulnerability scanner in fs mode
-            uses: aquasecurity/trivy-action@master
-            with:
-              scan-type: 'fs'
-              hide-progress: false
-              format: 'table'
-              exit-code: '1'
-              ignore-unfixed: true
-              severity: 'UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL'
+            - name: Run Trivy vulnerability scanner in fs mode
+              uses: aquasecurity/trivy-action@master
+              with:
+                scan-type: 'fs'
+                hide-progress: false
+                format: 'table'
+                exit-code: '1'
+                ignore-unfixed: true
+                severity: 'UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL'
       ```
       1. Save and push your changes.
       2. Check output for possible vulnerabilities.
