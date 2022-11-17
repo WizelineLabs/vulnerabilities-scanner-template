@@ -2,7 +2,7 @@
 
 ## Infrastructure as Code (cloudformation)
 
-1. Github actions pipeline or workflows are define under specific file structure `.github/workflows`. Pipeline is defined on file `ci-iac.yml`, create the file if there is no present: `touch .github/workflows/ci-iac.yml` . 
+1. Github actions pipeline or workflows are define under specific file structure `.github/workflows`. Pipeline is defined on file `ci-iac.yml`, create the file if there is no present: run `mkdir -p .github/workflows/` and then `touch .github/workflows/ci-iac.yml` . 
 2. Identify programming errors, bugs, stylistic errors and suspicious constructs by adding Linter or **lint job**.
    1. Copy the following code to pipeline file created:
 
@@ -76,9 +76,9 @@
               ignore-unfixed: true
               severity: 'UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL'
       ```
-      2. Save and push your changes.
-      3. Check output for possible vulnerabilities.
-      4. If no errors, let's continue!!.
+      1. Save and push your changes.
+      2. Check output for possible vulnerabilities.
+      3. If no errors, let's continue!!.
    <br/>
    <br/>
 4. Let's look for patterns in CloudFormation templates that may indicate insecure infrastructure.
