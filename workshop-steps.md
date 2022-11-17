@@ -242,6 +242,7 @@
       ```
     1. Save and Push your changes.
     2. Check on outputs on Pycharm-security check
+    3. Please notice pipeline continues even with warning, this behaviour can be configure with the below code: *****
    ![Pycharm results](img/2022-11-16-2-48-13.png)
     1. **Missing steps to cover asserts warinings??**********
 <br/>
