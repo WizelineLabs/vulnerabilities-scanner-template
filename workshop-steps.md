@@ -262,7 +262,7 @@
 <br/>
 <br/>
 
-6. **do we need to include grype without report??***** Add Grype (Anchore) Project Scan.
+6. **do we need to include grype without report??******* Add Grype (Anchore) Project Scan.
    1. Add the bellow code to the `ci-backend.yml` file:
       ```yml
       docker-grype-project:
