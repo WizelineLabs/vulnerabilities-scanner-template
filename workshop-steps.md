@@ -78,7 +78,17 @@
       ```
       1. Save and push your changes.
       2. Check output for possible vulnerabilities.
-      3. If no errors, let's continue!!.
+      3. If pipeline failed for flag: *Image user should not be ‘root’* Ref: https://avd.aquasec.com/misconfig/ds002
+      4. Fix the issue by creating `.trivyignore` at root level of your repo with the following content:
+      
+         Reference link: [trivy DS-0002](https://avd.aquasec.com/misconfig/dockerfile/general/avd-ds-0002/)
+
+         ```yml
+         # Running containers with 'root' user can lead to a container escape situation. It is a best practice to run containers as non-root users, which can be done by adding a 'USER' statement to the Dockerfile.
+         DS002
+         ```
+      5. Save and push your changes.
+      6. Check output for possible vulnerabilities.
    <br/>
    <br/>
 4. Let's look for patterns in CloudFormation templates that may indicate insecure infrastructure.
@@ -104,14 +114,7 @@
       ```
    2. Push your changes.
    3. Check output to identify possible errors. 
-   4. Fix the issue by creating `.trivyignore` at root level of your repo with the following content:
-   
-      Reference link: [trivy DS-0002](https://avd.aquasec.com/misconfig/dockerfile/general/avd-ds-0002/)
 
-      ```yml
-      # Running containers with 'root' user can lead to a container escape situation. It is a best practice to run containers as non-root users, which can be done by adding a 'USER' statement to the Dockerfile.
-      DS002
-      ```
     1. Commit and Push your changes. 
     2. If no errors, let's continue!!.
 <br/>
