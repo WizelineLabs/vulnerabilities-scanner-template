@@ -135,11 +135,6 @@
               quiet: false # optional: display only failed checks
               soft_fail: false # optional: do not return an error code if there are failed checks
               skip_check: CKV_AWS_115,CKV_AWS_116,CKV_AWS_173,CKV_AWS_260
-              # framework: cloudformation # optional: run only on a specific infrastructure {cloudformation,terraform,kubernetes,all}
-              # output_format: json # optional: the output format, one of: cli, json, junitxml, github_failed_only
-              # download_external_modules: true # optional: download external terraform modules from public git repositories and terraform registry
-              # # log_level: DEBUG # optional: set log level. Default WARNING
-              # baseline: cloudformation/.checkov.baseline # optional: Path to a generated baseline file. Will only report results not in the baseline.
       ```
     2. Commit and Push your changes. 
     3. If no errors, let's continue!!.
