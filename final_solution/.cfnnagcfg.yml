@@ -1,0 +1,12 @@
+---
+RulesToSuppress:
+- id: W2
+  reason: Security Groups found with cidr open to world on ingress.  This should never be true on instance.  Permissible on ELB
+- id: W9
+  reason: Security Groups found with ingress cidr that is not /32
+- id: W58
+  reason: Lambda functions require permission to write CloudWatch Logs
+- id: W92
+  reason: Lambda functions should define ReservedConcurrentExecutions to reserve simultaneous executions
+- id: F1000
+  reason: Missing egress rule means all traffic is allowed outbound.  Make this explicit if it is desired configuration
