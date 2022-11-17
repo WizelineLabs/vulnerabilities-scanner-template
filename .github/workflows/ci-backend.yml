@@ -91,7 +91,6 @@ jobs:
       - name: Run PyCharm Security
         uses: tonybaloney/pycharm-security@master
 
-##do we need to include grype without report
   docker-grype-project:
     name: Grype (Anchore) Project Scan
     needs: [gitleaks]
