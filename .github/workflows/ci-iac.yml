@@ -47,5 +47,5 @@ jobs:
           hide-progress: false
           format: 'table'
           exit-code: '1'
-          ignore-unfixed: true
+          ignore-unfixed: false
           severity: 'UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL'
