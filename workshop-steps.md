@@ -35,7 +35,7 @@
 
    2. Push your changes.
    3. Check output to identify possible errors. 
-   4. Fix the issue by creating `.cfnlintrc.yml` with the following content:
+   4. Lets fix the warning from the scan by creating file at repo root level `.cfnlintrc.yml` or use command `touch .cfnlintrc.yml` and add following content:
 
       ```yml
       ignore_checks:
