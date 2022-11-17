@@ -258,7 +258,7 @@
               run: |
                 docker run -v ${PWD}:/truffle trufflesecurity/trufflehog:latest filesystem --directory="/truffle/"
       ```
-   2. Check output to identify possible errors.*
+   2. Check output to identify possible errors.
 <br/>
 <br/>
 
