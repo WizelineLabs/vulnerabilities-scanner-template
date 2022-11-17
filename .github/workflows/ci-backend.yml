@@ -106,13 +106,6 @@ jobs:
           path: "."
           fail-build: false
           output-format: table
-      #Advanced Security in Github must be enabled for this repository to upload report.
-      # - name: upload Anchore scan SARIF report
-      #   uses: github/codeql-action/upload-sarif@v2
-      #   with:
-      #     sarif_file: ${{ steps.scan-project.outputs.sarif }}
-      # - name: Inspect action SARIF report
-      #   run: cat ${{ steps.scan.outputs.sarif }}
 
   # docker-build:
   #   name: Build Docker image
