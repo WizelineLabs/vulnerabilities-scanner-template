@@ -306,7 +306,7 @@ Let's now create our pipeline for CI Backend, and explore the different tools th
 <br/>
 <br/>
 
-6. **do we need to include grype without report??***** Add Grype (Anchore) Project Scan.
+5. ***Grype (Anchore)***: Vulnerability scanner for container images and filesystems.
    1. Add the bellow code to the `ci-backend.yml` file:
       ```yml
         docker-grype-project:
@@ -323,65 +323,63 @@ Let's now create our pipeline for CI Backend, and explore the different tools th
               with:
                 path: "."
                 fail-build: false
-            # Advanced Security in Github must be enabled for this repository to upload report.
-            # - name: upload Anchore scan SARIF report
-            #   uses: github/codeql-action/upload-sarif@v2
-            #   with:
-            #     sarif_file: ${{ steps.scan-project.outputs.sarif }}
+                output-format: table
       ```
-   2. Check output to identify possible errors.
-   3. Save and push your changes
+   2. Save and push your changes.
+   3. Check pipeline output; You should see the below vulnerability found, since we did specify parameter ***fail-build: false*** the job got completed, but you can change this behaviour by setting the value to ***true***.
+   ![grype result](img/2022-11-18-4-46-19.png)
+   1. Awesome!! Let's continue...
    <br/>
    <br/>
-7. Now, lets create our Docker image.
+6. Now, lets create our Docker image.
    1. Add docker build job code to `ci-backend.yml` file:
       ```yml
-      docker-build:
-        name: Build Docker image
-        outputs:
-          full_docker_image_tag: ${{ steps.build_image.outputs.full_docker_image_tag }}
-          image_tag: ${{ steps.build_image.outputs.image_tag }}
-        runs-on: ubuntu-latest
-        needs: [security-checks, unit-tests-and-coverage, lint, docker-grype-project]
-        steps:
-          - name: Check out Git repository
-            uses: actions/checkout@v3
+        docker-build:
+          name: Build Docker image
+          outputs:
+            full_docker_image_tag: ${{ steps.build_image.outputs.full_docker_image_tag }}
+            image_tag: ${{ steps.build_image.outputs.image_tag }}
+          runs-on: ubuntu-latest
+          needs: [security-checks, unit-tests-and-coverage, lint, docker-grype-project]
+          steps:
+            - name: Check out Git repository
+              uses: actions/checkout@v3
 
-          - name: Add SHORT_SHA and BRANCH_TAG env variables
-            run: |
-              echo "SHORT_SHA=`echo ${GITHUB_SHA} | cut -c1-8`" >> $GITHUB_ENV
-              echo "BRANCH_TAG=`echo ${GITHUB_REF##*/}`" >> $GITHUB_ENV
+            - name: Add SHORT_SHA and BRANCH_TAG env variables
+              run: |
+                echo "SHORT_SHA=`echo ${GITHUB_SHA} | cut -c1-8`" >> $GITHUB_ENV
+                echo "BRANCH_TAG=`echo ${GITHUB_REF##*/}`" >> $GITHUB_ENV
 
-          - name: Set IMAGE_TAG env variable
-            run: |
-              echo "IMAGE_TAG=`echo ${BRANCH_TAG}-${SHORT_SHA}`" >> $GITHUB_ENV
+            - name: Set IMAGE_TAG env variable
+              run: |
+                echo "IMAGE_TAG=`echo ${BRANCH_TAG}-${SHORT_SHA}`" >> $GITHUB_ENV
 
-          - name: Build and tag image
-            id: build_image
-            env:
-              REGISTRY: ghcr.io
-              IMAGE_NAME: ${{ github.repository }}
-              ECR_REPOSITORY: ${{ github.repository }}
-              IMAGE_TAG: ${{ env.IMAGE_TAG }}
-            run: |
-              echo REGISTRY: $REGISTRY
-              echo ECR_REPOSITORY: $ECR_REPOSITORY
-              echo IMAGE_TAG: $IMAGE_TAG
-              echo "Building and tagging $REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ..."
-              docker build -t $REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f Dockerfile .
-              mkdir -p /tmp
-              docker save "$REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" > /tmp/docker-image.tar
-              echo "full_docker_image_tag=$REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
-              echo "image_tag=$IMAGE_TAG" >> $GITHUB_OUTPUT
+            - name: Build and tag image
+              id: build_image
+              env:
+                REGISTRY: ghcr.io
+                IMAGE_NAME: ${{ github.repository }}
+                ECR_REPOSITORY: ${{ github.repository }}
+                IMAGE_TAG: ${{ env.IMAGE_TAG }}
+              run: |
+                echo REGISTRY: $REGISTRY
+                echo ECR_REPOSITORY: $ECR_REPOSITORY
+                echo IMAGE_TAG: $IMAGE_TAG
+                echo "Building and tagging $REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ..."
+                docker build -t $REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f Dockerfile .
+                mkdir -p /tmp
+                docker save "$REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" > /tmp/docker-image.tar
+                echo "full_docker_image_tag=$REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+                echo "image_tag=$IMAGE_TAG" >> $GITHUB_OUTPUT
 
-          - name: Upload artifact
-            uses: actions/upload-artifact@v2
-            with:
-              name: docker-image
-              path: /tmp/docker-image.tar
-              retention-days: 1
+            - name: Upload artifact
+              uses: actions/upload-artifact@v2
+              with:
+                name: docker-image
+                path: /tmp/docker-image.tar
+                retention-days: 1
       ```
-8. Lets scan our Docker image for vulnerabilities, add *Docker-trivy-vul* job to pipeline.
+7. Lets scan our Docker image for vulnerabilities, add *Docker-trivy-vul* job to pipeline.
    1. Add docker trivy job to `ci-backend.yml` file:
       ```yml
       docker-trivy-vuln:
@@ -410,8 +408,8 @@ Let's now create our pipeline for CI Backend, and explore the different tools th
               vuln-type: "os,library"
               severity: "UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL"
       ```
-    2. Push your changes.
-    3. If no issues, let's continue.
+    1. Push your changes.
+    2. If no issues, let's continue.
 <br/>
 <br/>
 

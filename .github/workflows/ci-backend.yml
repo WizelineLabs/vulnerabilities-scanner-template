@@ -20,6 +20,7 @@ jobs:
 
   TruffleHog:
     runs-on: ubuntu-latest
+    needs: [gitleaks]
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -56,8 +57,74 @@ jobs:
           path: "."
           fail-build: false
           output-format: table
-      # Advanced Security in Github must be enabled for this repository to upload report.
-      # - name: upload Anchore scan SARIF report
-      #   uses: github/codeql-action/upload-sarif@v2
-      #   with:
-      #     sarif_file: ${{ steps.scan-project.outputs.sarif }}
+
+  docker-build:
+    name: Build Docker image
+    outputs:
+      full_docker_image_tag: ${{ steps.build_image.outputs.full_docker_image_tag }}
+      image_tag: ${{ steps.build_image.outputs.image_tag }}
+    runs-on: ubuntu-latest
+    needs: [security-checks, docker-grype-project]
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v3
+
+      - name: Add SHORT_SHA and BRANCH_TAG env variables
+        run: |
+          echo "SHORT_SHA=`echo ${GITHUB_SHA} | cut -c1-8`" >> $GITHUB_ENV
+          echo "BRANCH_TAG=`echo ${GITHUB_REF##*/}`" >> $GITHUB_ENV
+
+      - name: Set IMAGE_TAG env variable
+        run: |
+          echo "IMAGE_TAG=`echo ${BRANCH_TAG}-${SHORT_SHA}`" >> $GITHUB_ENV
+
+      - name: Build and tag image
+        id: build_image
+        env:
+          REGISTRY: ghcr.io
+          IMAGE_NAME: ${{ github.repository }}
+          ECR_REPOSITORY: ${{ github.repository }}
+          IMAGE_TAG: ${{ env.IMAGE_TAG }}
+        run: |
+          echo REGISTRY: $REGISTRY
+          echo ECR_REPOSITORY: $ECR_REPOSITORY
+          echo IMAGE_TAG: $IMAGE_TAG
+          echo "Building and tagging $REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ..."
+          docker build -t $REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f Dockerfile .
+          mkdir -p /tmp
+          docker save "$REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" > /tmp/docker-image.tar
+          echo "full_docker_image_tag=$REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+          echo "image_tag=$IMAGE_TAG" >> $GITHUB_OUTPUT
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: docker-image
+          path: /tmp/docker-image.tar
+          retention-days: 1
+
+  docker-trivy-vuln:
+    name: Trivy vulnerability scanner
+    runs-on: ubuntu-latest
+    needs: [docker-build]
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: docker-image
+          path: /tmp
+      - name: Load Docker image
+        run: |
+          docker load --input /tmp/docker-image.tar
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: "${{ needs.docker-build.outputs.full_docker_image_tag }}"
+          format: "template"
+          template: "@/contrib/sarif.tpl"
+          output: "trivy-results.sarif"
+          exit-code: "0"
+          ignore-unfixed: true
+          vuln-type: "os,library"
+          severity: "UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL"
