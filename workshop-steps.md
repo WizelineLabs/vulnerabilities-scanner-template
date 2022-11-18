@@ -216,7 +216,22 @@
 Let's now create our pipeline for CI Backend, and explore the different tools that will help you to secure your deployments and pipelines.
 
 1. Let's start by creating our pipeline file `ci-backend.yml` or using command-line `touch .github/workflows/ci-backend.yml` under `.github/workflows`.
-2. ***Gitleaks***: This tool helps in detecting and preventing hardcoded secrets like passwords, api keys, and tokens in git.
+2. ***Trufflehog***: is an open source secrets detection engine that finds leaky API keys and passwords
+   1. Add the following code to pipeline file created:
+      ```yml
+        TruffleHog:
+        runs-on: ubuntu-latest
+        steps:
+          - name: Checkout code
+            uses: actions/checkout@v3
+            with:
+              fetch-depth: 0
+
+          - name: TruffleHog
+            run: |
+              docker run -v ${PWD}:/truffle trufflesecurity/trufflehog:latest filesystem --directory="/truffle/"
+      ```
+3. ***Gitleaks***: This tool helps in detecting and preventing hardcoded secrets like passwords, api keys, and tokens in git.
    1. Add the following code to pipeline file created:
       ```yml
       name: CI Backend
@@ -239,46 +254,11 @@ Let's now create our pipeline for CI Backend, and explore the different tools th
               run: |
                 docker run -v ${PWD}:/path zricethezav/gitleaks:latest detect --source="/path/" -v -l debug --no-git
       ```
-   2. Push your changes.
-   3. Check output to identify possible errors. 
-   4. Fix the issue based on gitleaks results, check for parameters found: *Finding*,*Secret*,*File*,*Line*.
-   ![gitleaks results](img/2022-11-14-11-37-41.png)
-   1. Push your changes and validate outputs.
-<br/>
-<br/>
-
-2. Lets add file `.pylintrc` to repo structure and move on the warnings showed on outputs.
-   ![Lint results](img/2022-11-16-2-34-14.png)
-   2. This time we will wait to complete step #3 to push our changes.
-
-3. Let's run a Lint test to our code again, add the below job to `ci-backend.yml` file; This will check for leaks in our python file `lambda.py`
-   1. Add following code:
-      ```yml
-      lint:
-        name: Lint
-        runs-on: ubuntu-latest
-        #env:
-        needs: [gitleaks]
-        #  FLASK_ENV: development
-        steps:
-          - name: checkout git repository
-            uses: actions/checkout@v3
-
-          - name: Setup Python 3.8
-            uses: actions/setup-python@v3
-            with:
-              python-version: "3.8"
-
-          - name: Install dependencies
-            run: pip install -r requirements.txt
-
-          - name: Lint
-            run: pylint ./lambda/*.py
-      ```
    2. Gitleaks performs leaks based on regex expressions, you can get more detail by checking file: `.gitleaks.toml`.
    3. Check output to identify possible leaks. As a best practice, never leave secrets exposed, even when those are commented lines at the end is plain text that can be exploited.
    ![gitleaks results](img/2022-11-18-2-41-39.png)
-   4. Fix the flagged code on `lambda.py`, remove commented line that shows #token, and replace secrets value withe string: 'test' as per code below (do not copy pointing arrows):
+   1. Check on gitleaks results for parameters found: *Finding*,*Secret*,*File*,*Line*.
+   2. Fix flagged code on `lambda.py`, remove commented line that shows #token, and replace secrets value withe string: 'test' as per code below (do not copy pointing arrows):
       ```yml
         def get_logs_client():
             """Get AWS logs client either local or real"""
@@ -294,7 +274,7 @@ Let's now create our pipeline for CI Backend, and explore the different tools th
                     endpoint_url="http://localhost:4566",
                 )
       ```
-    5. save and push your changes.
+    1. save and push your changes.
    <br/>
    <br/>
 4. ***PyCharm Security***: This tool allows you to run a security check to your repository.
@@ -323,25 +303,6 @@ Let's now create our pipeline for CI Backend, and explore the different tools th
         ```
 
     4. Yopu can explore this on your own; For the purpose of the demo, lets continue!!
-<br/>
-<br/>
-
-5. Add Trufflehog job to scan filesystem to discover vulnerabilities.
-   1. Add the bellow code to the `ci-backend.yml` file:
-      ```yml
-        TruffleHog:
-          runs-on: ubuntu-latest
-          steps:
-            - name: Checkout code
-              uses: actions/checkout@v3
-              with:
-                fetch-depth: 0
-
-            - name: TruffleHog
-              run: |
-                docker run -v ${PWD}:/truffle trufflesecurity/trufflehog:latest filesystem --directory="/truffle/"
-      ```
-   2. Check output to identify possible errors.
 <br/>
 <br/>
 

@@ -18,17 +18,6 @@ jobs:
         run: |
           docker run -v ${PWD}:/path zricethezav/gitleaks:latest detect --source="/path/" -v -l debug --no-git
 
-  security-checks:
-    runs-on: ubuntu-latest
-    needs: [gitleaks]
-    name: Pycharm-security check
-    steps:
-      - name: checkout git repository
-        uses: actions/checkout@v3
-
-      - name: Run PyCharm Security
-        uses: tonybaloney/pycharm-security@master
-
   TruffleHog:
     runs-on: ubuntu-latest
     steps:
@@ -40,3 +29,35 @@ jobs:
       - name: TruffleHog
         run: |
           docker run -v ${PWD}:/truffle trufflesecurity/trufflehog:latest filesystem --directory="/truffle/"
+
+  security-checks:
+    runs-on: ubuntu-latest
+    needs: [gitleaks]
+    name: Pycharm-security check
+    steps:
+      - name: checkout git repository
+        uses: actions/checkout@v3
+
+      - name: Run PyCharm Security
+        uses: tonybaloney/pycharm-security@master
+
+  docker-grype-project:
+    name: Grype (Anchore) Project Scan
+    needs: [gitleaks]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v3
+
+      - name: Scan current project with Grype (Anchore)
+        id: scan-project
+        uses: anchore/scan-action@v3
+        with:
+          path: "."
+          fail-build: false
+          output-format: table
+      # Advanced Security in Github must be enabled for this repository to upload report.
+      # - name: upload Anchore scan SARIF report
+      #   uses: github/codeql-action/upload-sarif@v2
+      #   with:
+      #     sarif_file: ${{ steps.scan-project.outputs.sarif }}
