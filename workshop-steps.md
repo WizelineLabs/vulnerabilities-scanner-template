@@ -176,10 +176,24 @@
               directory: cfn/
               quiet: false # optional: display only failed checks
               soft_fail: false # optional: do not return an error code if there are failed checks
-              skip_check: CKV_AWS_115,CKV_AWS_116,CKV_AWS_173,CKV_AWS_260
+              #skip_check: CKV_AWS_115,CKV_AWS_116,CKV_AWS_173,CKV_AWS_260
       ```
-    2. Commit and Push your changes. 
-    3. If no errors, let's continue!!.
+    2. Commit and Push your changes.
+    3. Static security analysis show diffent valudation flags from the scan.
+    ![checkov scan](img/2022-11-18-1-38-26.png)
+    4. For thew purpose of the demo, we will skip those flags by uncomment the parameter skip_check as below:
+        ```yml
+          - name: Run Checkov action
+              id: checkov
+              uses: bridgecrewio/checkov-action@master
+              with:
+              directory: cfn/
+              quiet: false # optional: display only failed checks
+              soft_fail: false # optional: do not return an error code if there are failed checks
+              skip_check: CKV_AWS_115,CKV_AWS_116,CKV_AWS_173,CKV_AWS_260
+        ```
+    5. Save and push your changes.
+    5. If no errors, let's continue!!.
 <br/>
 <br/>
 
