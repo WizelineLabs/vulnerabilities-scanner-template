@@ -310,12 +310,19 @@ Let's now create our pipeline for CI Backend, and explore the different tools th
 
             - name: Run PyCharm Security
               uses: tonybaloney/pycharm-security@master
+              fail_on_warnings: yes
       ```
     1. Save and Push your changes.
-    2. Check on outputs on Pycharm-security check
-    3. Please notice pipeline continues even with warning, this behaviour can be configure with the below code: *****
-   ![Pycharm results](img/2022-11-16-2-48-13.png)
-    1. **Missing steps to cover asserts warinings??**********
+    2. Check on outputs on Pycharm-security check.
+      ![Pycharm results](img/2022-11-16-2-48-13.png)
+    3. Please notice pipeline continues even with warnings are flagged, if you want to modify this behaviour and force the pipeline to fail, this can be achive by adding extra argument ***fail_on_warnings*** set to ***true***:
+        ```yml
+          - name: Run PyCharm Security
+            uses: tonybaloney/pycharm-security@master
+            fail_on_warnings: yes
+        ```
+
+    4. Yopu can explore this on your own; For the purpose of the demo, lets continue!!
 <br/>
 <br/>
 
@@ -341,25 +348,25 @@ Let's now create our pipeline for CI Backend, and explore the different tools th
 6. **do we need to include grype without report??***** Add Grype (Anchore) Project Scan.
    1. Add the bellow code to the `ci-backend.yml` file:
       ```yml
-      docker-grype-project:
-        name: Grype (Anchore) Project Scan
-        needs: [gitleaks]
-        runs-on: ubuntu-latest
-        steps:
-          - name: Check out Git repository
-            uses: actions/checkout@v3
+        docker-grype-project:
+          name: Grype (Anchore) Project Scan
+          needs: [gitleaks]
+          runs-on: ubuntu-latest
+          steps:
+            - name: Check out Git repository
+              uses: actions/checkout@v3
 
-          - name: Scan current project with Grype (Anchore)
-            id: scan-project
-            uses: anchore/scan-action@v3
-            with:
-              path: "."
-              fail-build: false
-          # Advanced Security in Github must be enabled for this repository to upload report.
-          # - name: upload Anchore scan SARIF report
-          #   uses: github/codeql-action/upload-sarif@v2
-          #   with:
-          #     sarif_file: ${{ steps.scan-project.outputs.sarif }}
+            - name: Scan current project with Grype (Anchore)
+              id: scan-project
+              uses: anchore/scan-action@v3
+              with:
+                path: "."
+                fail-build: false
+            # Advanced Security in Github must be enabled for this repository to upload report.
+            # - name: upload Anchore scan SARIF report
+            #   uses: github/codeql-action/upload-sarif@v2
+            #   with:
+            #     sarif_file: ${{ steps.scan-project.outputs.sarif }}
       ```
    2. Check output to identify possible errors.
    3. Save and push your changes

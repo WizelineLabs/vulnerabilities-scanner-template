@@ -1,10 +1,6 @@
 """Set retention configuration for log groups with missing retention configuration"""
 import os
 import boto3
-import yaml
-
-with open('cfg.yaml') as cfg:
-    config = yaml.load(cfg)
 
 IS_DEPLOYMENT = os.environ["ENVIRONMENT"] in ["prd", "stg", "sandbox"]
 region_name = os.environ.get("REGION", "us-east-1")
