@@ -277,23 +277,39 @@ Let's now create our pipeline for CI Backend, and explore the different tools th
       ```
    2. Gitleaks performs leaks based on regex expressions, you can get more detail by checking file: `.gitleaks.toml`.
    3. Check output to identify possible leaks. As a best practice, never leave secrets exposed, even when those are commented lines at the end is plain text that can be exploited.
-   ![Lint results](img/2022-11-14-7-41-55.png)
-   1. Fix the issue by removing Trailing whitespace on `lambda.py`.
+   ![gitleaks results](img/2022-11-18-2-41-39.png)
+   4. Fix the flagged code on `lambda.py`, remove commented line that shows #token, and replace secrets value withe string: 'test' as per code below (do not copy pointing arrows):
+      ```yml
+        def get_logs_client():
+            """Get AWS logs client either local or real"""
+
+            if IS_DEPLOYMENT:
+                return boto3.client("logs", region_name=region_name)
+            else:
+                return boto3.client(
+                    "logs",
+                    aws_access_key_id="test", <-----
+                    aws_secret_access_key="test", <-----
+                    region_name=region_name,
+                    endpoint_url="http://localhost:4566",
+                )
+      ```
+    5. save and push your changes.
    <br/>
    <br/>
-4. Lets run a security check to our repository by using PyCharm Security.
+4. ***PyCharm Security***: This tool allows you to run a security check to your repository.
    1. Add the bellow code to the `ci-backend.yml` file:
       ```yml
-      security-checks:
-        runs-on: ubuntu-latest
-        needs: [gitleaks]
-        name: Pycharm-security check
-        steps:
-          - name: checkout git repository
-            uses: actions/checkout@v3
+        security-checks:
+          runs-on: ubuntu-latest
+          needs: [gitleaks]
+          name: Pycharm-security check
+          steps:
+            - name: checkout git repository
+              uses: actions/checkout@v3
 
-          - name: Run PyCharm Security
-            uses: tonybaloney/pycharm-security@master
+            - name: Run PyCharm Security
+              uses: tonybaloney/pycharm-security@master
       ```
     1. Save and Push your changes.
     2. Check on outputs on Pycharm-security check
