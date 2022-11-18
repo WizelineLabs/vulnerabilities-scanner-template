@@ -120,7 +120,7 @@
               uses: stelligent/cfn_nag@master
               with:
                 input_path: cfn
-                extra_args: --fail-on-warnings --blacklist-path .cfnnagcfg.yml
+                extra_args: --fail-on-warnings
 
             - name: Fail if cfn_nag scan contains failures, warnings
               # sum cfn_nag failures, warnigns and return it as exit code
@@ -128,10 +128,25 @@
                 exit `grep -E '^(Failures|Warnings)' cfn_nag.out | awk '{ SUM += $3} END { print SUM }'`
       ```
    2. Push your changes.
-   3. Check output to identify possible errors. 
-
-    1. Commit and Push your changes. 
-    2. If no errors, let's continue!!.
+   3. Check scan resultset, notice the different warinings listed and create a plan of action on a real environment; For now, lets skip the warnings in order to continue.
+   4.  Add an exception file at repo root level `.cfnnagcfg.yml` -> `touch .cfnnagcfg.yml`
+       1. Add the below rules to supress on scan:
+        ```yml
+          ---
+          RulesToSuppress:
+          - id: W2
+            reason: Security Groups found with cidr open to world on ingress.  This should never be true on instance.  Permissible on ELB
+          - id: W9
+            reason: Security Groups found with ingress cidr that is not /32
+          - id: W58
+            reason: Lambda functions require permission to write CloudWatch Logs
+          - id: W92
+            reason: Lambda functions should define ReservedConcurrentExecutions to reserve simultaneous executions
+          - id: F1000
+            reason: Missing egress rule means all traffic is allowed outbound.  Make this explicit if it is desired configuration
+        ```
+    5. Commit and Push your changes. 
+    6. If no errors, let's continue!!.
 <br/>
 <br/>
 
