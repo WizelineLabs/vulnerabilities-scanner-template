@@ -106,7 +106,7 @@
           ```
    <br/>
    <br/>
-4. Let's look for patterns in CloudFormation templates that may indicate insecure infrastructure.
+4. In this step, let's look for patterns in our CloudFormation templates that may indicate insecure infrastructure, we will use ***stelligent/cfn_nag*** in our pipeline for this purpose.
    1. Add the following code to pipeline file created:
       ```yml
         insecure-cf:
@@ -130,8 +130,7 @@
    2. Push your changes.
    3. Check scan resultset, notice the different warinings listed and create a plan of action on a real environment; For now, lets skip the warnings in order to continue.
    ![stelligent warning](img/2022-11-18-12-17-18.png)
-   1.  Add an exception file at repo root level `.cfnnagcfg.yml` -> `touch .cfnnagcfg.yml`
-       1. Add the below rules to supress on scan:
+   4.  Add an exception file for those warinings at repo root level `.cfnnagcfg.yml` -> `touch .cfnnagcfg.yml` and add the below rules to supress on scan..lets add an additional extra argumement ` --deny-list-path .cfnnagcfg.yml` to the job to consider the exception file:
         ```yml
           ---
           RulesToSuppress:
@@ -146,8 +145,17 @@
           - id: F1000
             reason: Missing egress rule means all traffic is allowed outbound.  Make this explicit if it is desired configuration
         ```
-    1. Commit and Push your changes. 
-    2. If no errors, let's continue!!.
+   5. Lets add an additional extra argumement ` --deny-list-path .cfnnagcfg.yml` to the job to consider the exception file:
+        ```yml
+            - name: Insecure Cloudformation patterns
+              uses: stelligent/cfn_nag@master
+              with:
+                input_path: cfn
+                extra_args: --fail-on-warnings --deny-list-path .cfnnagcfg.yml
+        ```
+
+    6. Commit and Push your changes. 
+    7. If no errors, let's continue!!.
 <br/>
 <br/>
 
