@@ -129,7 +129,8 @@
       ```
    2. Push your changes.
    3. Check scan resultset, notice the different warinings listed and create a plan of action on a real environment; For now, lets skip the warnings in order to continue.
-   4.  Add an exception file at repo root level `.cfnnagcfg.yml` -> `touch .cfnnagcfg.yml`
+   ![stelligent warning](img/2022-11-18-12-17-18.png)
+   1.  Add an exception file at repo root level `.cfnnagcfg.yml` -> `touch .cfnnagcfg.yml`
        1. Add the below rules to supress on scan:
         ```yml
           ---
@@ -145,8 +146,8 @@
           - id: F1000
             reason: Missing egress rule means all traffic is allowed outbound.  Make this explicit if it is desired configuration
         ```
-    5. Commit and Push your changes. 
-    6. If no errors, let's continue!!.
+    1. Commit and Push your changes. 
+    2. If no errors, let's continue!!.
 <br/>
 <br/>
 

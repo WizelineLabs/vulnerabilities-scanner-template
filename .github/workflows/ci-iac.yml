@@ -61,7 +61,7 @@ jobs:
         uses: stelligent/cfn_nag@master
         with:
           input_path: cfn
-          extra_args: --fail-on-warnings
+          extra_args: --fail-on-warnings --deny-list-path .cfnnagcfg.yml
           #extra_args: --fail-on-warnings --blacklist-path .cfnnagcfg.yml
 
       - name: Fail if cfn_nag scan contains failures, warnings
