@@ -251,7 +251,7 @@ Let's now create our pipeline for CI Backend, and explore the different tools th
    ![Lint results](img/2022-11-16-2-34-14.png)
    2. This time we will wait to complete step #3 to push our changes.
 
-3. Let's run a Lint test to our code again, add the below job to `ci-backend.yml` file.
+3. Let's run a Lint test to our code again, add the below job to `ci-backend.yml` file; This will check for leaks in our python file `lambda.py`
    1. Add following code:
       ```yml
       lint:
@@ -275,7 +275,8 @@ Let's now create our pipeline for CI Backend, and explore the different tools th
           - name: Lint
             run: pylint ./lambda/*.py
       ```
-   2. Check output to identify possible errors.
+   2. Gitleaks performs leaks based on regex expressions, you can get more detail by checking file: `.gitleaks.toml`.
+   3. Check output to identify possible leaks. As a best practice, never leave secrets exposed, even when those are commented lines at the end is plain text that can be exploited.
    ![Lint results](img/2022-11-14-7-41-55.png)
    1. Fix the issue by removing Trailing whitespace on `lambda.py`.
    <br/>
