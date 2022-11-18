@@ -213,34 +213,37 @@
 
 ## Application Code (Backend on Python)
 
-1. Add Gitleaks docker execution. This tool helps in detecting and preventing hardcoded secrets like passwords, api keys, and tokens in git.
+Let's now create our pipeline for CI Backend, and explore the different tools that will help you to secure your deployments and pipelines.
+
+1. Let's start by creating our pipeline file `ci-backend.yml` or using command-line `touch .github/workflows/ci-backend.yml` under `.github/workflows`.
+2. ***Gitleaks***: This tool helps in detecting and preventing hardcoded secrets like passwords, api keys, and tokens in git.
    1. Add the following code to pipeline file created:
       ```yml
-        name: CI Backend
-        on:
-          [workflow_dispatch, push]
+      name: CI Backend
+      on:
+        [workflow_dispatch, push]
 
-        concurrency: ci-backend-${{ github.ref }}
+      concurrency: ci-backend-${{ github.ref }}
 
-        jobs:
+      jobs:
 
-          gitleaks:
-            name: gitleaks
-            runs-on: ubuntu-latest
-            steps:
-              - uses: actions/checkout@v3
-                with:
-                  fetch-depth: 0
-              
-              - name: run gitleaks docker
-                run: |
-                  docker run -v ${PWD}:/path zricethezav/gitleaks:latest detect --source="/path/" -v -l debug --no-git
+        gitleaks:
+          name: gitleaks
+          runs-on: ubuntu-latest
+          steps:
+            - uses: actions/checkout@v3
+              with:
+                fetch-depth: 0
+            
+            - name: run gitleaks docker
+              run: |
+                docker run -v ${PWD}:/path zricethezav/gitleaks:latest detect --source="/path/" -v -l debug --no-git
       ```
    2. Push your changes.
    3. Check output to identify possible errors. 
    4. Fix the issue based on gitleaks results, check for parameters found: *Finding*,*Secret*,*File*,*Line*.
    ![gitleaks results](img/2022-11-14-11-37-41.png)
-   5. Push your changes and validate outputs.
+   1. Push your changes and validate outputs.
 <br/>
 <br/>
 

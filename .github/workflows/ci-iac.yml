@@ -84,3 +84,12 @@ jobs:
           quiet: false # optional: display only failed checks
           soft_fail: false # optional: do not return an error code if there are failed checks
           skip_check: CKV_AWS_115,CKV_AWS_116,CKV_AWS_173,CKV_AWS_260
+
+  deploy:
+    name: deploy 
+    needs: [checkov,insecure-cf,trivy,lint]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy the thing
+        run: |
+          echo Deploying 🚀
