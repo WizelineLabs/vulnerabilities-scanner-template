@@ -78,7 +78,7 @@
       ```
       1. Save and push your changes.
       2. Check output for possible vulnerabilities.
-      3. If pipeline failed for flag: *Image user should not be ‘root’* Ref: https://avd.aquasec.com/misconfig/ds002
+      3. If pipeline failed for flag: *Image user should not be ‘root’* Reference Link: https://avd.aquasec.com/misconfig/ds002
       4. Fix the issue by creating `.trivyignore` at root level of your repo with the following content:
       
          Reference link: [trivy DS-0002](https://avd.aquasec.com/misconfig/dockerfile/general/avd-ds-0002/)
@@ -88,7 +88,22 @@
          DS002
          ```
       5. Save and push your changes.
-      6. Check output for possible vulnerabilities.
+      6. Check output pipeline status.
+      7. Trivy possibly flad the scan with CVE-2022-42969, you can find more details [HERE](https://avd.aquasec.com/nvd/2022/cve-2022-42969/). You can deep dive into the subject on your own:
+      ![CVE-2022-42969](img/2022-11-17-8-37-59.png)
+      For now, lets ignore this flag by changing value in our trivy scanner fs mode code, modify parameter ->> *ignore-unfixed* and set value = true:
+      
+          ```yml
+          - name: Run Trivy vulnerability scanner in fs mode
+            uses: aquasecurity/trivy-action@master
+            with:
+              scan-type: 'fs'
+              hide-progress: false
+              format: 'table'
+              exit-code: '1'
+              ignore-unfixed: true
+              severity: 'UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL'
+          ```
    <br/>
    <br/>
 4. Let's look for patterns in CloudFormation templates that may indicate insecure infrastructure.

@@ -46,6 +46,6 @@ jobs:
           scan-type: 'fs'
           hide-progress: false
           format: 'table'
-          exit-code: '1'
+          exit-code: '0'
           ignore-unfixed: false
           severity: 'UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL'
