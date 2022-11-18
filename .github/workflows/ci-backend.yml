@@ -121,10 +121,8 @@ jobs:
         uses: aquasecurity/trivy-action@master
         with:
           image-ref: "${{ needs.docker-build.outputs.full_docker_image_tag }}"
-          format: "template"
-          template: "@/contrib/sarif.tpl"
-          output: "trivy-results.sarif"
-          exit-code: "0"
-          ignore-unfixed: true
-          vuln-type: "os,library"
-          severity: "UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL"
+          hide-progress: false
+          format: 'table'
+          exit-code: '0'
+          ignore-unfixed: false
+          severity: 'UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL'
