@@ -333,7 +333,7 @@ Let's now create our pipeline for CI Backend, and explore the different tools th
             full_docker_image_tag: ${{ steps.build_image.outputs.full_docker_image_tag }}
             image_tag: ${{ steps.build_image.outputs.image_tag }}
           runs-on: ubuntu-latest
-          needs: [security-checks, trufflehog, docker-grype-project]
+          needs: [security-checks, trufflehog, docker-grype]
           steps:
             - name: Check out Git repository
               uses: actions/checkout@v3
