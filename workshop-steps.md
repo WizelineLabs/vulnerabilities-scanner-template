@@ -2,7 +2,7 @@
 
 ## Infrastructure as Code (cloudformation)
 
-1. Github actions pipeline or workflows are define under specific file structure `.github/workflows`. Pipeline is defined on file `ci-iac.yml`, create the file if there is no present: run `mkdir -p .github/workflows/` and then `touch .github/workflows/ci-iac.yml` . 
+1. Github actions pipeline or workflows are define under specific file structure `.github/workflows`. Pipeline is defined on file `ci-iac.yml`, create the file if there is not present: command-line `mkdir -p .github/workflows/` and then `touch .github/workflows/ci-iac.yml`. 
 2. Identify programming errors, bugs, stylistic errors and suspicious constructs by adding Linter or **lint job**.
    1. Copy the following code to pipeline file created:
 
@@ -35,7 +35,7 @@
 
    2. Push your changes.
    3. Check output to identify possible errors. 
-   4. Lets fix the warning from the scan by creating file at repo root level `.cfnlintrc.yml` or use command `touch .cfnlintrc.yml` and add following content:
+   4. Let's fix the warning from the scan job by creating file at repository root level named `.cfnlintrc.yml` or using command-line `touch .cfnlintrc.yml` and add following content:
 
       ```yml
       ignore_checks:
@@ -46,7 +46,7 @@
    <br/>
    <br/>
 3. Implement Security Scanner: *Aqua Security Trivy*
-   1. Add the following code to our pipeline file created `ci-iac.yml`:
+   1. Add the following code to your pipeline file `ci-iac.yml`:
       ```yml
         trivy:
           name: Run Trivy (Iac and fs mode)
@@ -73,25 +73,25 @@
                 hide-progress: false
                 format: 'table'
                 exit-code: '1'
-                ignore-unfixed: true
+                ignore-unfixed: false
                 severity: 'UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL'
       ```
-      1. Save and push your changes.
-      2. Check output for possible vulnerabilities.
-      3. If pipeline failed for flag: *Image user should not be ‘root’* Reference Link: https://avd.aquasec.com/misconfig/ds002
-      4. Fix the issue by creating `.trivyignore` at root level of your repo with the following content:
-      
+   2. Save and push your changes.
+   3. Check output for possible vulnerabilities.
+   4. If pipeline failed for flag: *Image user should not be ‘root’* Reference Link: https://avd.aquasec.com/misconfig/ds002
+   5. Fix the issue by creating a file named `.trivyignore` at root level of your repository and add the following content:
+   
          Reference link: [trivy DS-0002](https://avd.aquasec.com/misconfig/dockerfile/general/avd-ds-0002/)
 
          ```yml
          # Running containers with 'root' user can lead to a container escape situation. It is a best practice to run containers as non-root users, which can be done by adding a 'USER' statement to the Dockerfile.
          DS002
          ```
-      5. Save and push your changes.
-      6. Check output pipeline status.
-      7. Trivy possibly flad the scan with CVE-2022-42969, you can find more details [HERE](https://avd.aquasec.com/nvd/2022/cve-2022-42969/). You can deep dive into the subject on your own:
-      ![CVE-2022-42969](img/2022-11-17-8-37-59.png)
-      For now, lets ignore this flag by changing value in our trivy scanner fs mode code, modify parameter ->> *ignore-unfixed* and set value = true:
+   6. Save and push your changes.
+   7. Check output pipeline status.
+   8. Trivy possibly identified a vulnerability with CVE-2022-42969, you can find more details [HERE](https://avd.aquasec.com/nvd/2022/cve-2022-42969/). You can deep dive into the subject on your own:
+   ![CVE-2022-42969](img/2022-11-17-8-37-59.png)
+   For now, let's ignore this flag by changing a value under trivy scanner fs mode code, look for parameter ->> *ignore-unfixed* and set value = true:
       
           ```yml
           - name: Run Trivy vulnerability scanner in fs mode
@@ -130,7 +130,7 @@
    2. Push your changes.
    3. Check scan resultset, notice the different warinings listed and create a plan of action on a real environment; For now, lets skip the warnings in order to continue.
    ![stelligent warning](img/2022-11-18-12-17-18.png)
-   4.  Add an exception file for those warinings at repo root level `.cfnnagcfg.yml` -> `touch .cfnnagcfg.yml` and add the below rules to supress on scan..lets add an additional extra argumement ` --deny-list-path .cfnnagcfg.yml` to the job to consider the exception file:
+   1.  Add an exception file for those warinings at repository root level named `.cfnnagcfg.yml` or using command-line `touch .cfnnagcfg.yml` and add the below rules to supress on scan:
         ```yml
           ---
           RulesToSuppress:
@@ -145,7 +145,7 @@
           - id: F1000
             reason: Missing egress rule means all traffic is allowed outbound.  Make this explicit if it is desired configuration
         ```
-   5. Lets add an additional extra argumement ` --deny-list-path .cfnnagcfg.yml` to the job to consider the exception file:
+   2. Lets add an additional extra argumement ` --deny-list-path .cfnnagcfg.yml` to the job to consider the exception file:
         ```yml
             - name: Insecure Cloudformation patterns
               uses: stelligent/cfn_nag@master
@@ -154,8 +154,8 @@
                 extra_args: --fail-on-warnings --deny-list-path .cfnnagcfg.yml
         ```
 
-    6. Commit and Push your changes. 
-    7. If no errors, let's continue!!.
+    1. Save and Push your changes. 
+    2. If no errors, let's continue...
 <br/>
 <br/>
 
@@ -179,9 +179,9 @@
                 #skip_check: CKV_AWS_115,CKV_AWS_116,CKV_AWS_173,CKV_AWS_260
         ```
     2. Commit and Push your changes.
-    3. Static security analysis show diffent valudation flags from the scan.
+    3. Static security analysis show diffent validation flags from the scan.
     ![checkov scan](img/2022-11-18-1-38-26.png)
-    4. For thew purpose of the demo, we will skip those flags by uncomment the parameter skip_check as below:
+    4. For thew purpose of the demo, we will skip those flags by uncomment the parameter *skip_check* as below:
         ```yml
           - name: Run Checkov action
               id: checkov
@@ -193,11 +193,11 @@
               skip_check: CKV_AWS_115,CKV_AWS_116,CKV_AWS_173,CKV_AWS_260
         ```
     5. Save and push your changes.
-    5. If no errors, let's continue!!.
+    5. If no errors, let's continue...
 <br/>
 <br/>
 
-6. Add last step to validate all previous steps are completed `[checkov,insecure-cf,trivy,lint]`, if any of those fail it will not complete.
+6. Add final job to validate all previous steps `[checkov,insecure-cf,trivy,lint]` are completed, if any of those fail it will not complete.
    1. Add the following code to pipeline file created:
       ```yml
         deploy:
@@ -213,7 +213,7 @@
 
 ## Application Code (Backend on Python)
 
-Let's now create our pipeline for CI Backend, and explore the different tools that will help you to secure your deployments and pipelines.
+Let's now create our pipeline for CI Backend and explore the different tools that will help you to secure your deployments and pipelines.
 
 1. Let's start by creating our pipeline file `ci-backend.yml` or using command-line `touch .github/workflows/ci-backend.yml` under `.github/workflows`.
 2. ***Trufflehog***: is an open source secrets detection engine that finds leaky API keys and passwords
@@ -255,10 +255,10 @@ Let's now create our pipeline for CI Backend, and explore the different tools th
                 docker run -v ${PWD}:/path zricethezav/gitleaks:latest detect --source="/path/" -v -l debug --no-git
       ```
    2. Gitleaks performs leaks based on regex expressions, you can get more detail by checking file: `.gitleaks.toml`.
-   3. Check output to identify possible leaks. As a best practice, never leave secrets exposed, even when those are commented lines at the end is plain text that can be exploited.
+   3. Check output to identify possible leaks. As a best practice, never leave secrets exposed, even when those are commented lines, at the end is plain text that can be exploited.
    ![gitleaks results](img/2022-11-18-2-41-39.png)
    1. Check on gitleaks results for parameters found: *Finding*,*Secret*,*File*,*Line*.
-   2. Fix flagged code on `lambda.py`, remove commented line that shows #token, and replace secrets value withe string: 'test' as per code below (do not copy pointing arrows):
+   2. Fix flagged code on `lambda.py`, remove commented line that shows #token, and replace secrets value withe string: "test" as per code below (do not copy pointing arrows):
       ```yml
         def get_logs_client():
             """Get AWS logs client either local or real"""
@@ -274,7 +274,7 @@ Let's now create our pipeline for CI Backend, and explore the different tools th
                     endpoint_url="http://localhost:4566",
                 )
       ```
-    1. save and push your changes.
+    1. Save and push your changes.
    <br/>
    <br/>
 4. ***PyCharm Security***: This tool allows you to run a security check to your repository.
@@ -292,10 +292,10 @@ Let's now create our pipeline for CI Backend, and explore the different tools th
               uses: tonybaloney/pycharm-security@master
       ```
     1. Save and Push your changes.
-    2. Check on outputs on Pycharm-security check.
+    2. Check on outputs for Pycharm-security check.
       ![Pycharm results](img/2022-11-16-2-48-13.png)
-    3. Please notice pipeline continues even with warnings are flagged, if you want to modify this behaviour and force the pipeline to fail, this can be achived by adding extra argument ***fail_on_warnings*** set to ***true***:
-    4. You can explore this on your own; For the purpose of the demo, lets continue!!
+    3. Please notice that your pipeline continues even when warnings are flagged, if you want to modify this behaviour and force the pipeline to fail, this can be achieved by adding extra argument ***fail_on_warnings*** and set that to ***true***:
+    4. You can explore this on your own; For the purpose of the demo, let's continue...
 <br/>
 <br/>
 
@@ -324,8 +324,8 @@ Let's now create our pipeline for CI Backend, and explore the different tools th
    1. Awesome!! Let's continue...
    <br/>
    <br/>
-6. Now, lets create our Docker image.
-   1. Add docker build job code to `ci-backend.yml` file:
+6. Now, lets create your Docker image.
+   1. Add docker build job code block to `ci-backend.yml` file:
       ```yml
         docker-build:
           name: Build Docker image
@@ -402,7 +402,7 @@ Let's now create our pipeline for CI Backend, and explore the different tools th
                 severity: "UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL"
       ```
     1. Push your changes.
-    2. If no issues, let's continue.
+    2. If no issues, let's continue...
 <br/>
 <br/>
 
@@ -432,11 +432,11 @@ Let's now create our pipeline for CI Backend, and explore the different tools th
                   fail-build: false
         ```
     2. Push your changes.
-    3. If no issues, let's continue.
+    3. If no issues, let's continue..
 <br/>
 <br/>
 
-1.  Our final step is a validation job which depends on previous security scans in order to complete:
+1. Our final step is a validation job which depends on previous security scans in order to complete:
     1. Add the below job and push your changes:
       ```yml
         deploy:
@@ -448,4 +448,5 @@ Let's now create our pipeline for CI Backend, and explore the different tools th
               run: |
                 echo Deploying 🚀
       ```
-2.  Happy deploy... 🚀
+2. If pipeline succeeded, you are all set!!!!!!
+3. Happy deploy... 🚀
