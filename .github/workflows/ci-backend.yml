@@ -42,7 +42,7 @@ jobs:
       - name: Run PyCharm Security
         uses: tonybaloney/pycharm-security@master
 
-  docker-grype-project:
+  docker-grype:
     name: Grype (Anchore) Project Scan
     needs: [gitleaks]
     runs-on: ubuntu-latest
