@@ -219,29 +219,29 @@ Let's now create our pipeline for CI Backend, and explore the different tools th
 2. ***Trufflehog***: is an open source secrets detection engine that finds leaky API keys and passwords
    1. Add the following code to pipeline file created:
       ```yml
-        TruffleHog:
-        runs-on: ubuntu-latest
-        steps:
-          - name: Checkout code
-            uses: actions/checkout@v3
-            with:
-              fetch-depth: 0
+        name: CI Backend
+        on:
+          [workflow_dispatch, push]
 
-          - name: TruffleHog
-            run: |
-              docker run -v ${PWD}:/truffle trufflesecurity/trufflehog:latest filesystem --directory="/truffle/"
+        concurrency: ci-backend-${{ github.ref }}
+
+        jobs:
+
+          TruffleHog:
+            runs-on: ubuntu-latest
+            steps:
+              - name: Checkout code
+                uses: actions/checkout@v3
+                with:
+                  fetch-depth: 0
+
+              - name: trufflehog
+                run: |
+                  docker run -v ${PWD}:/truffle trufflesecurity/trufflehog:latest filesystem --directory="/truffle/"
       ```
 3. ***Gitleaks***: This tool helps in detecting and preventing hardcoded secrets like passwords, api keys, and tokens in git.
    1. Add the following code to pipeline file created:
       ```yml
-      name: CI Backend
-      on:
-        [workflow_dispatch, push]
-
-      concurrency: ci-backend-${{ github.ref }}
-
-      jobs:
-
         gitleaks:
           name: gitleaks
           runs-on: ubuntu-latest
@@ -290,19 +290,12 @@ Let's now create our pipeline for CI Backend, and explore the different tools th
 
             - name: Run PyCharm Security
               uses: tonybaloney/pycharm-security@master
-              fail_on_warnings: yes
       ```
     1. Save and Push your changes.
     2. Check on outputs on Pycharm-security check.
       ![Pycharm results](img/2022-11-16-2-48-13.png)
-    3. Please notice pipeline continues even with warnings are flagged, if you want to modify this behaviour and force the pipeline to fail, this can be achive by adding extra argument ***fail_on_warnings*** set to ***true***:
-        ```yml
-          - name: Run PyCharm Security
-            uses: tonybaloney/pycharm-security@master
-            fail_on_warnings: yes
-        ```
-
-    4. Yopu can explore this on your own; For the purpose of the demo, lets continue!!
+    3. Please notice pipeline continues even with warnings are flagged, if you want to modify this behaviour and force the pipeline to fail, this can be achived by adding extra argument ***fail_on_warnings*** set to ***true***:
+    4. You can explore this on your own; For the purpose of the demo, lets continue!!
 <br/>
 <br/>
 
@@ -340,7 +333,7 @@ Let's now create our pipeline for CI Backend, and explore the different tools th
             full_docker_image_tag: ${{ steps.build_image.outputs.full_docker_image_tag }}
             image_tag: ${{ steps.build_image.outputs.image_tag }}
           runs-on: ubuntu-latest
-          needs: [security-checks, unit-tests-and-coverage, lint, docker-grype-project]
+          needs: [security-checks, trufflehog, docker-grype-project]
           steps:
             - name: Check out Git repository
               uses: actions/checkout@v3
