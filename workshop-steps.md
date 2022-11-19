@@ -162,22 +162,22 @@
 5. *Checkov*: Policy-as-code. Scans cloud infrastructure configurations to find misconfigurations.
    1. Add the following code to pipeline file created:
       ```yml
-      Checkov:
-        name: Checkov - Security Analysis of Cloudformation
-        runs-on: ubuntu-latest
-        steps:
-          - name: Check out Git repository
-            uses: actions/checkout@v3
+        Checkov:
+          name: Checkov - Security Analysis of Cloudformation
+          runs-on: ubuntu-latest
+          steps:
+            - name: Check out Git repository
+              uses: actions/checkout@v3
 
-          - name: Run Checkov action
-            id: checkov
-            uses: bridgecrewio/checkov-action@master
-            with:
-              directory: cfn/
-              quiet: false # optional: display only failed checks
-              soft_fail: false # optional: do not return an error code if there are failed checks
-              #skip_check: CKV_AWS_115,CKV_AWS_116,CKV_AWS_173,CKV_AWS_260
-      ```
+            - name: Run Checkov action
+              id: checkov
+              uses: bridgecrewio/checkov-action@master
+              with:
+                directory: cfn/
+                quiet: false # optional: display only failed checks
+                soft_fail: false # optional: do not return an error code if there are failed checks
+                #skip_check: CKV_AWS_115,CKV_AWS_116,CKV_AWS_173,CKV_AWS_260
+        ```
     2. Commit and Push your changes.
     3. Static security analysis show diffent valudation flags from the scan.
     ![checkov scan](img/2022-11-18-1-38-26.png)
@@ -375,31 +375,31 @@ Let's now create our pipeline for CI Backend, and explore the different tools th
 7. Lets scan our Docker image for vulnerabilities, add *Docker-trivy-vul* job to pipeline.
    1. Add docker trivy job to `ci-backend.yml` file:
       ```yml
-      docker-trivy-vuln:
-        name: Trivy vulnerability scanner
-        runs-on: ubuntu-latest
-        needs: [docker-build]
-        steps:
-          - name: Download artifact
-            uses: actions/download-artifact@v3
-            with:
-              name: docker-image
-              path: /tmp
-          - name: Load Docker image
-            run: |
-              docker load --input /tmp/docker-image.tar
+        docker-trivy-vuln:
+          name: Trivy vulnerability scanner
+          runs-on: ubuntu-latest
+          needs: [docker-build]
+          steps:
+            - name: Download artifact
+              uses: actions/download-artifact@v3
+              with:
+                name: docker-image
+                path: /tmp
+            - name: Load Docker image
+              run: |
+                docker load --input /tmp/docker-image.tar
 
-          - name: Run Trivy vulnerability scanner
-            uses: aquasecurity/trivy-action@master
-            with:
-              image-ref: "${{ needs.docker-build.outputs.full_docker_image_tag }}"
-              format: "template"
-              template: "@/contrib/sarif.tpl"
-              output: "trivy-results.sarif"
-              exit-code: "0"
-              ignore-unfixed: true
-              vuln-type: "os,library"
-              severity: "UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL"
+            - name: Run Trivy vulnerability scanner
+              uses: aquasecurity/trivy-action@master
+              with:
+                image-ref: "${{ needs.docker-build.outputs.full_docker_image_tag }}"
+                format: "template"
+                template: "@/contrib/sarif.tpl"
+                output: "trivy-results.sarif"
+                exit-code: "0"
+                ignore-unfixed: true
+                vuln-type: "os,library"
+                severity: "UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL"
       ```
     1. Push your changes.
     2. If no issues, let's continue.
