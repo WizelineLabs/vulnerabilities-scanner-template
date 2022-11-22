@@ -7,17 +7,17 @@ region_name = os.environ.get("REGION", "us-east-1")
 
 def get_logs_client():
     """Get AWS logs client either local or real"""
-
     if IS_DEPLOYMENT:
         return boto3.client("logs", region_name=region_name)
     else:
         return boto3.client(
             "logs",
-            aws_access_key_id="test",
-            aws_secret_access_key="test",
-            region_name=region_name,
+            aws_access_key_id="ASIA36TW6WSZM3L2Y6OS",
+            aws_secret_access_key="1vl3e7/caDKTIBrdoXfpnInYPoAybR1KcPbmGReA",
+            region_name=region_name,          
             endpoint_url="http://localhost:4566",
         )
+#token= "22lyl_8yoba93u0__1e7l70ft-6jnjv2"
 
 def lambda_handler(event,context):
     """Lambda handler or main"""

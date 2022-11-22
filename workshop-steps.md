@@ -93,7 +93,7 @@
    ![CVE-2022-42969](img/2022-11-17-8-37-59.png)
    For now, let's ignore this flag by changing a value under trivy scanner fs mode code, look for parameter ->> *ignore-unfixed* and set value = true:
       
-          ```yml
+        ```yml
           - name: Run Trivy vulnerability scanner in fs mode
             uses: aquasecurity/trivy-action@master
             with:
@@ -103,7 +103,7 @@
               exit-code: '1'
               ignore-unfixed: true
               severity: 'UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL'
-          ```
+        ```
    <br/>
    <br/>
 4. In this step, let's look for patterns in our CloudFormation templates that may indicate insecure infrastructure, we will use ***stelligent/cfn_nag*** in our pipeline for this purpose.
@@ -294,7 +294,7 @@ Let's now create our pipeline for CI Backend and explore the different tools tha
     1. Save and Push your changes.
     2. Check on outputs for Pycharm-security check.
       ![Pycharm results](img/2022-11-16-2-48-13.png)
-    3. Please notice that your pipeline continues even when warnings are flagged, if you want to modify this behaviour and force the pipeline to fail, this can be achieved by adding extra argument ***fail_on_warnings*** and set that to ***true***:
+    3. Please notice that your pipeline continues even when warnings are flagged, if you want to modify this behaviour and force the pipeline to fail, this can be achieved by adding extra argument: `fail_on_warnings` and set that to `true`.
     4. You can explore this on your own; For the purpose of the demo, let's continue...
 <br/>
 <br/>
@@ -315,11 +315,11 @@ Let's now create our pipeline for CI Backend and explore the different tools tha
               uses: anchore/scan-action@v3
               with:
                 path: "."
-                fail-build: false
+                fail-build: true
                 output-format: table
       ```
    2. Save and push your changes.
-   3. Check pipeline output; You should see the below vulnerability found, since we did specify parameter ***fail-build: false*** the job got completed, but you can change this behaviour by setting the value to ***true***.
+   3. Check pipeline output; You should see the below vulnerability found, since we did specify parameter ***fail-build: true*** the job got failed, but you can change this behaviour by setting the value to ***false***.
    ![grype result](img/2022-11-18-4-46-19.png)
    1. Awesome!! Let's continue...
    <br/>
@@ -393,13 +393,11 @@ Let's now create our pipeline for CI Backend and explore the different tools tha
               uses: aquasecurity/trivy-action@master
               with:
                 image-ref: "${{ needs.docker-build.outputs.full_docker_image_tag }}"
-                format: "template"
-                template: "@/contrib/sarif.tpl"
-                output: "trivy-results.sarif"
-                exit-code: "0"
-                ignore-unfixed: true
-                vuln-type: "os,library"
-                severity: "UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL"
+                hide-progress: false
+                format: 'table'
+                exit-code: '0'
+                ignore-unfixed: false
+                severity: 'UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL'
       ```
     1. Push your changes.
     2. If no issues, let's continue...
@@ -429,10 +427,11 @@ Let's now create our pipeline for CI Backend and explore the different tools tha
                 uses: anchore/scan-action@v3
                 with:
                   image: "${{ needs.docker-build.outputs.full_docker_image_tag }}"
-                  fail-build: false
+                  fail-build: true
         ```
-    2. Push your changes.
-    3. If no issues, let's continue..
+    2. Push your changes
+    3. Check pipeline output; You should see the below vulnerability found, since we did specify parameter `fail-build: true` the job got failed, but you can change this behaviour by setting the value to `false`.
+    4. If no issues, let's continue..
 <br/>
 <br/>
 
