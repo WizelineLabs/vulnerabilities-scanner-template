@@ -2,8 +2,10 @@
 
 ## Infrastructure as Code (cloudformation)
 
-1. Github actions pipeline or workflows are define under specific file structure `.github/workflows`. Pipeline is defined on file `ci-iac.yml`, create the file if there is not present: command-line `mkdir -p .github/workflows/` and then `touch .github/workflows/ci-iac.yml`. 
-2. Identify programming errors, bugs, stylistic errors and suspicious constructs by adding Linter or **lint job**.
+1. Let's first start by clonning the demo repository, create a new directory (command-line): `mkdir demo` (you can give any name of your preference) and access to folder: `cd demo` . If you previously worked with Github and already have SSH keys added to your account, you can use the following command in current directory: `(git clone git@github.com:wizeline/vulnerabilities-scanner-template.git .)` or if you prefer, you can also use https: `(git clone https://github.com/wizeline/vulnerabilities-scanner-template.git .)`.
+2. You can list all files you have cloned by typing: `ls -a` into current directory; The command will display multiple files, please notice that folder `/final_solution/` will contain all demo files in its final stage, meaning you can easily copy and paste the respective files by following the instructions here and be able to proceed with pipeline without any failures, however we strongly suggest to follow along to see every step for each tool fail, and it's respective solution accordingly.
+3. Github actions pipeline or workflows are define under specific file structure `.github/workflows`. Pipeline is defined on file `ci-iac.yml`, create the file if there is not present: command-line `mkdir -p .github/workflows/` and then `touch .github/workflows/ci-iac.yml`. 
+4. Identify programming errors, bugs, stylistic errors and suspicious constructs by adding Linter or **lint job**.
    1. Copy the following code to pipeline file created:
 
       ```yml
@@ -45,7 +47,7 @@
    5. Save and push your changes.
    <br/>
    <br/>
-3. Implement Security Scanner: *Aqua Security Trivy*
+5. Implement Security Scanner: *Aqua Security Trivy*
    1. Add the following code to your pipeline file `ci-iac.yml`:
       ```yml
         trivy:
@@ -106,7 +108,7 @@
         ```
    <br/>
    <br/>
-4. In this step, let's look for patterns in our CloudFormation templates that may indicate insecure infrastructure, we will use ***stelligent/cfn_nag*** in our pipeline for this purpose.
+6. In this step, let's look for patterns in our CloudFormation templates that may indicate insecure infrastructure, we will use ***stelligent/cfn_nag*** in our pipeline for this purpose.
    1. Add the following code to pipeline file created:
       ```yml
         insecure-cf:
