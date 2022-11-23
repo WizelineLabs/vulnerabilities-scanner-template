@@ -1,0 +1,76 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Infra as Code
+Parameters:
+
+  AthenaCalendarDB:
+    Type: String
+    # Default: MSP-Workgroup
+    Description: Database to be used by calendar
+
+  S3AthenaQueryResults: 
+    Type: String
+    Description: S3 Bucket where the Athena Query Results are stored
+
+  lambdaRole: 
+    Type: String
+    Description: Lambda Role to be used to execute the Lambda function
+
+  VPCSecurityGroupIds: 
+    Type: String
+    # Default: sg-02872b2ef95fbc2f9
+    Description: VPC Security Group Ids
+
+  VPCSubnetId1: 
+    Type: String
+    # Default: subnet-d39d1b8a
+    Description: VPC Subnet Id 1
+
+  VPCSubnetId2: 
+    Type: String
+    # Default: subnet-6569eb04
+    Description: VPC Subnet Id 
+
+  VPCId: 
+    Type: String
+    Description: VPC Id
+
+Resources:
+  calendarLambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: lambda-calendar
+      Runtime: python3.8
+      Role: !Sub ${lambdaRole}
+      VpcConfig:
+        SecurityGroupIds:
+          - !Sub ${VPCSecurityGroupIds}
+        SubnetIds:
+          - !Sub ${VPCSubnetId1}
+          - !Sub ${VPCSubnetId2}
+      Handler: 445-calendar.CalendarLambda
+      Code: lambda/lambda.py
+      Description: This Lambda does something
+      TracingConfig:
+        Mode: Active
+      Timeout: 30
+      MemorySize: 512
+      Environment:
+        Variables:
+          S3_ATHENA_QUERY_RESULTS: !Sub ${S3AthenaQueryResults}
+          ATHENA_CALENDAR_DB: !Sub ${AthenaCalendarDB}
+
+  PublicAlbSecurityGroup:
+    Properties:
+      GroupDescription: 'Security group for a public Application Load Balancer'
+      VpcId: !Sub ${VPCId}
+    Type: AWS::EC2::SecurityGroup
+  PublicAlbSecurityGroupHttpIngress:
+    Properties:
+      CidrIp: 0.0.0.0/0
+      FromPort: 80
+      GroupId:
+        Ref: PublicAlbSecurityGroup
+      IpProtocol: tcp
+      ToPort: 80
+      Description: "password too wide open group"
+    Type: AWS::EC2::SecurityGroupIngress
