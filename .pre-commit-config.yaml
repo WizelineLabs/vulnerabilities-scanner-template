@@ -1,0 +1,11 @@
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+repos:
+-   repo: https://github.com/mxab/pre-commit-trivy.git
+    rev: v0.3.0
+    hooks:
+    -   id: trivyfs-docker
+        args:
+          - --skip-dirs
+          - ./tests
+          - . # last arg indicates the path/file to scan
