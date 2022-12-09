@@ -84,7 +84,6 @@ def get_log_groups_without_retention(log_groups, retention_days):
 
     return log_groups_without_retention
 
-
 def update_log_group_retention_setting(logs_client, log_group_name, retention_days):
     """Update log group retention configuration for a specific log group"""
 
