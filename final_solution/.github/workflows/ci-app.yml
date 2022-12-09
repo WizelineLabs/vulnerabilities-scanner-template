@@ -1,8 +1,8 @@
-name: CI Backend
+name: CI App
 on:
   [workflow_dispatch, push]
 
-concurrency: ci-backend-${{ github.ref }}
+concurrency: ci-app-${{ github.ref }}
 
 jobs:
 
@@ -31,7 +31,7 @@ jobs:
         run: |
           docker run -v ${PWD}:/truffle trufflesecurity/trufflehog:latest filesystem --directory="/truffle/"
 
-  security-checks:
+  pycharm:
     runs-on: ubuntu-latest
     needs: [gitleaks]
     name: Pycharm-security check
@@ -64,7 +64,7 @@ jobs:
       full_docker_image_tag: ${{ steps.build_image.outputs.full_docker_image_tag }}
       image_tag: ${{ steps.build_image.outputs.image_tag }}
     runs-on: ubuntu-latest
-    needs: [security-checks, trufflehog, docker-grype]
+    needs: [pycharm, trufflehog, docker-grype]
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v3

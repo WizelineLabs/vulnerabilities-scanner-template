@@ -1,10 +1,8 @@
-# Vulnerabilities Scanner Demo
+# Vulnerabilities Scanner Workshop
 
-This a demo of how to implement Vulnerabilities Scanning in your code
+This an step by step workshop of how to implement Vulnerabilities Scanning in your code. Workshop steps are [HERE](workshop-steps.md)
 
-## Features included
-
-### Infrastructure as a Code
+## Infrastructure as a Code
 
 - [Cloudformation Linter](https://github.com/marketplace/actions/cfn-lint-action)
   - Validate CloudFormation yaml/json templates against the CloudFormation spec and additional checks. Includes checking valid values for resource properties and best practices.
@@ -19,7 +17,7 @@ This a demo of how to implement Vulnerabilities Scanning in your code
 - [bridgecrewio/checkov-action](https://github.com/bridgecrewio/checkov-action)
   - This GitHub Action runs [Checkov](https://github.com/bridgecrewio/checkov) against an Infrastructure-as-Code repository. Checkov performs static security analysis of Terraform & CloudFormation Infrastructure code .
 
-### Security Scanning for Application Code
+## Security Scanning for Application Code
 
 - [gitleaks](https://github.com/zricethezav/gitleaks)
   - Gitleaks is a SAST tool for detecting and preventing hardcoded secrets like passwords, api keys, and tokens in git repos. Gitleaks is an easy-to-use, all-in-one solution for detecting secrets, past or present, in your code.
