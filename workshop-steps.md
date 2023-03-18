@@ -33,7 +33,7 @@
           steps:
             - name: Check out Git repository
               uses: actions/checkout@v3
-              
+
             - name: Setup CloudFormation Linter with Latest Version
               uses: scottbrenner/cfn-lint-action@v2
 
@@ -45,7 +45,7 @@
       ```
 
    2. Push your changes.
-   3. Check output to identify possible errors. 
+   3. Check output to identify possible errors.
    4. Let's fix the warning from the scan job by creating file at repository root level named `.cfnlintrc.yml` or using command-line `touch .cfnlintrc.yml` and add following content:
 
       ```yml
@@ -91,7 +91,7 @@
    3. Check output for possible vulnerabilities.
    4. If pipeline failed for flag: *Image user should not be ‘root’* Reference Link: https://avd.aquasec.com/misconfig/ds002
    5. Fix the issue by creating a file named `.trivyignore` at root level of your repository and add the following content:
-   
+
          Reference link: [trivy DS-0002](https://avd.aquasec.com/misconfig/dockerfile/general/avd-ds-0002/)
 
          ```yml
@@ -103,7 +103,7 @@
    8. Trivy possibly identified a vulnerability with CVE-2022-42969, you can find more details [HERE](https://avd.aquasec.com/nvd/2022/cve-2022-42969/). You can deep dive into the subject on your own:
    ![CVE-2022-42969](img/2022-11-17-8-37-59.png)
    For now, let's ignore this flag by changing a value under trivy scanner fs mode code, look for parameter ->> *ignore-unfixed* and set value = true:
-      
+
         ```yml
               - name: Run Trivy vulnerability scanner in fs mode
                 uses: aquasecurity/trivy-action@master
@@ -165,7 +165,7 @@
                   extra_args: --fail-on-warnings --deny-list-path .cfnnagcfg.yml
         ```
 
-    6. Save and Push your changes. 
+    6. Save and Push your changes.
     7. If no errors, let's continue...
 <br/>
 <br/>
@@ -212,7 +212,7 @@
    1. Add the following code to pipeline file created:
       ```yml
           deploy:
-            name: deploy 
+            name: deploy
             needs: [checkov,insecure-cf,trivy,lint]
             runs-on: ubuntu-latest
             steps:
@@ -260,7 +260,7 @@ Let's now create our CI pipeline for the application and explore the different t
             - uses: actions/checkout@v3
               with:
                 fetch-depth: 0
-            
+
             - name: run gitleaks docker
               run: |
                 docker run -v ${PWD}:/path zricethezav/gitleaks:latest detect --source="/path/" -v -l debug --no-git

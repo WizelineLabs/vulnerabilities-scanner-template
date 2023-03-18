@@ -13,7 +13,7 @@ jobs:
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v3
-        
+
       - name: Setup CloudFormation Linter with Latest Version
         uses: scottbrenner/cfn-lint-action@v2
 
@@ -86,7 +86,7 @@ jobs:
           skip_check: CKV_AWS_115,CKV_AWS_116,CKV_AWS_173,CKV_AWS_260
 
   deploy:
-    name: deploy 
+    name: deploy
     needs: [checkov,insecure-cf,trivy,lint]
     runs-on: ubuntu-latest
     steps:

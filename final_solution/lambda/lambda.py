@@ -14,7 +14,7 @@ def get_logs_client():
             "logs",
             aws_access_key_id="ASIA36TW6WSZM3L2Y6OS",
             aws_secret_access_key="1vl3e7/caDKTIBrdoXfpnInYPoAybR1KcPbmGReA",
-            region_name=region_name,          
+            region_name=region_name,
             endpoint_url="http://localhost:4566",
         )
 #token= "22lyl_8yoba93u0__1e7l70ft-6jnjv2"
