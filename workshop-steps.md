@@ -564,7 +564,7 @@ pre-commit is a tool that allows to automatically execute linting, testing, vali
     ```bash
     ❯ pre-commit install
     ❯ # add some files (git add)
-    ❯ pre-commit run
+    ❯ pre-commit run # or try to commit some changes
     ```
 
 4. See output
