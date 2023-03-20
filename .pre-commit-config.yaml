@@ -1,13 +1,11 @@
 repos:
 -   repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v2.3.0
+    rev: v4.4.0
     hooks:
     -   id: end-of-file-fixer
     -   id: trailing-whitespace
-
 
 -   repo: https://github.com/zricethezav/gitleaks
     rev: v8.16.1
     hooks:
     -   id: gitleaks
-        # args: ["protect","--source=.","--verbose","--redact","--staged","-l debug"]
