@@ -559,4 +559,12 @@ pre-commit is a tool that allows to automatically execute linting, testing, vali
 
 1. Install [pre-commit](https://pre-commit.com/#install)
 2. Install [gitleaks](https://github.com/gitleaks/gitleaks#installing)
-3. un-comment lines from `.pre-commit-config-yaml`
+3. Run:
+
+    ```bash
+    ❯ pre-commit install
+    ❯ # add some files (git add)
+    ❯ pre-commit run
+    ```
+
+4. See output

@@ -12,12 +12,12 @@ def get_logs_client():
     else:
         return boto3.client(
             "logs",
-            aws_access_key_id="ASIA36TW6WSZM3L2Y6OS",
-            aws_secret_access_key="1vl3e7/caDKTIBrdoXfpnInYPoAybR1KcPbmGReA",
+            aws_access_key_id="test",
+            aws_secret_access_key="test",
             region_name=region_name,
             endpoint_url="http://localhost:4566",
         )
-#token= "22lyl_8yoba93u0__1e7l70ft-6jnjv2"
+
 
 def lambda_handler(event,context):
     """Lambda handler or main"""
@@ -83,7 +83,6 @@ def get_log_groups_without_retention(log_groups, retention_days):
     print(f"log_groups_without_retention: {log_groups_without_retention}")
 
     return log_groups_without_retention
-
 
 def update_log_group_retention_setting(logs_client, log_group_name, retention_days):
     """Update log group retention configuration for a specific log group"""

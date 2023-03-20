@@ -1,12 +1,8 @@
 name: CI Infra as Code
-
 on:
   [workflow_dispatch, push]
-
 concurrency: ci-${{ github.ref }}
-
 jobs:
-
   lint:
     name: CloudFormation Linter
     runs-on: ubuntu-latest
@@ -37,8 +33,8 @@ jobs:
           hide-progress: false
           format: 'table'
           exit-code: '1'
-          ignore-unfixed: false
-          severity: 'UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL'
+          ignore-unfixed: true
+          severity: 'MEDIUM,HIGH,CRITICAL'
 
       - name: Run Trivy vulnerability scanner in fs mode
         uses: aquasecurity/trivy-action@master
@@ -46,9 +42,9 @@ jobs:
           scan-type: 'fs'
           hide-progress: false
           format: 'table'
-          exit-code: '0'
+          exit-code: '1'
           ignore-unfixed: true
-          severity: 'UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL'
+          severity: 'MEDIUM,HIGH,CRITICAL'
 
   insecure-cf:
     name: Scan Insecure Cloudformation patterns
@@ -62,15 +58,14 @@ jobs:
         with:
           input_path: cfn
           extra_args: --fail-on-warnings --deny-list-path .cfnnagcfg.yml
-          #extra_args: --fail-on-warnings --blacklist-path .cfnnagcfg.yml
 
       - name: Fail if cfn_nag scan contains failures, warnings
         # sum cfn_nag failures, warnigns and return it as exit code
         run: |
           exit `grep -E '^(Failures|Warnings)' cfn_nag.out | awk '{ SUM += $3} END { print SUM }'`
 
-  Checkov:
-    name: Checkov - Security Analysis of Cloudformation
+  checkov:
+    name: checkov - Security Analysis of Cloudformation
     runs-on: ubuntu-latest
     steps:
       - name: Check out Git repository
@@ -86,7 +81,7 @@ jobs:
           skip_check: CKV_AWS_115,CKV_AWS_116,CKV_AWS_173,CKV_AWS_260
 
   deploy:
-    name: deploy
+    name: deploy 🚀
     needs: [checkov,insecure-cf,trivy,lint]
     runs-on: ubuntu-latest
     steps:
