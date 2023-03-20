@@ -49,6 +49,9 @@ We will try to cover vulnerabilities scanning for the application code (a Python
 We are going to create two pipelines, one for the application code and one for the IaC:
 
 - The pipeline for the application code would look like:
-![](img/2022-10-28-15-02-35.png)
+
+  ![](img/app-pipeline.png)
+
 - The pipeline for the Infrastructure as Code would look like:
-![](img/2022-10-28-15-14-48.png)
+
+  ![](img/2022-10-28-15-14-48.png)
