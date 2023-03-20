@@ -13,7 +13,7 @@
     - [docker-trivy](#docker-trivy)
     - [docker-grype](#docker-grype)
     - [Deploy Application 🚀](#deploy-application-)
-  - [pre-commit](#pre-commit)
+  - [Bonus: pre-commit](#bonus-pre-commit)
 
 # Workshop Steps
 
@@ -550,7 +550,13 @@ Let's now create our CI pipeline for the application and explore the different t
               echo Deploying 🚀
     ```
 
-2. If pipeline succeeded, you are all set!!!!!!
+2. If pipeline succeeded, you are all set!
 3. Happy deploy... 🚀
 
-## pre-commit
+## Bonus: pre-commit
+
+pre-commit is a tool that allows to automatically execute linting, testing, validations, and other tools before commiting changes.
+
+1. Install [pre-commit](https://pre-commit.com/#install)
+2. Install [gitleaks](https://github.com/gitleaks/gitleaks#installing)
+3. un-comment lines from `.pre-commit-config-yaml`

@@ -4,3 +4,10 @@ repos:
     hooks:
     -   id: end-of-file-fixer
     -   id: trailing-whitespace
+
+
+-   repo: https://github.com/zricethezav/gitleaks
+    rev: v8.16.1
+    hooks:
+    -   id: gitleaks
+        # args: ["protect","--source=.","--verbose","--redact","--staged","-l debug"]
