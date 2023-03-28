@@ -1,6 +1,5 @@
 - [Workshop Steps](#workshop-steps)
   - [Infrastructure as Code (cloudformation)](#infrastructure-as-code-cloudformation)
-    - [IaC lintting](#iac-lintting)
     - [Trivy](#trivy)
     - [cfn\_nag](#cfn_nag)
     - [Checkov](#checkov)
@@ -31,44 +30,6 @@
 4. Please note directory `/final_solution/` contains all demo files in its final stage, meaning you can easily copy and paste the respective files by following the instructions here and be able to proceed with pipeline without any failures, however we strongly suggest to follow along to see every step for each tool fail, and it's respective solution accordingly.
 5. Create the IaC workflow on: `.github/workflows/ci-iac.yml`.
 
-### IaC lintting
-
-Objetive: Identify programming errors, bugs, stylistic errors and suspicious constructs by adding Linter or **lint job**.
-
-1. Copy the following code to `.github/workflows/ci-iac.yml`:
-
-    ```yml
-    name: CI Infra as Code
-    on:
-      [workflow_dispatch, push]
-    concurrency: ci-${{ github.ref }}
-    jobs:
-      lint:
-        name: CloudFormation Linter
-        runs-on: ubuntu-latest
-        steps:
-          - name: Check out Git repository
-            uses: actions/checkout@v3
-
-          - name: Setup CloudFormation Linter with Latest Version
-            uses: scottbrenner/cfn-lint-action@v2
-
-          - name: Lint CloudFormation files.
-            run: |
-              cfn-lint --version
-              cfn-lint -t cfn/*.y*ml -I
-    ```
-
-2. Push your changes and check the output to identify possible errors.
-   ![cfnlint-fail](img/cfnlint-fail.png)
-3. Let's fix the warning from the scan job by creating file at repository root level named `.cfnlintrc.yml` or using command-line `touch .cfnlintrc.yml` and add following content:
-
-    ```yml
-    ignore_checks:
-      - W3002 # This code may only work with `package` cli command as the property (Resources/emailSender/Properties/Code) is a string
-    ```
-
-4. Save and push your changes.
 
 ### Trivy
 
@@ -281,7 +242,7 @@ Objetive: Identify programming errors, bugs, stylistic errors and suspicious con
     ```yml
       deploy:
         name: deploy 🚀
-        needs: [checkov,insecure-cf,trivy,lint]
+        needs: [checkov,insecure-cf,trivy]
         runs-on: ubuntu-latest
         steps:
           - name: Deploy the thing

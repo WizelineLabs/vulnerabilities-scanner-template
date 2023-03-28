@@ -4,8 +4,6 @@ This an step by step workshop of how to implement Vulnerabilities Scanning in yo
 
 ## Infrastructure as a Code
 
-- [Cloudformation Linter](https://github.com/marketplace/actions/cfn-lint-action)
-  - Validate CloudFormation yaml/json templates against the CloudFormation spec and additional checks. Includes checking valid values for resource properties and best practices.
 - [stelligent/cfn_nag](https://github.com/stelligent/cfn_nag):
   - The cfn-nag tool looks for patterns in CloudFormation templates that may indicate insecure infrastructure. Roughly speaking, it will look for:
     - IAM rules that are too permissive (wildcards)
