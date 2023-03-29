@@ -38,6 +38,12 @@
 1. Add the following code to your pipeline file `.github/workflows/ci-iac.yml`:
 
     ```yml
+    name: CI Infra as Code
+    on:
+      [workflow_dispatch, push]
+    concurrency: ci-${{ github.ref }}
+    jobs:
+
       trivy:
         name: Run Trivy (Iac and fs mode)
         runs-on: ubuntu-latest
