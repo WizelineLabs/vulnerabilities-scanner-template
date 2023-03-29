@@ -31,7 +31,7 @@
 5. Create the IaC workflow on: `.github/workflows/ci-iac.yml`.
 
 
-### Trivy
+### Trivy [🔗](https://github.com/marketplace/actions/aqua-security-trivy)
 
 - Implement Security Scanner: *Aqua Security Trivy*
 
@@ -127,7 +127,7 @@
               severity: 'MEDIUM,HIGH,CRITICAL'
     ```
 
-### cfn_nag
+### cfn_nag [🔗](https://github.com/stelligent/cfn_nag)
 
 - In this step, let's look for patterns in our CloudFormation templates that may indicate insecure infrastructure, we will use ***stelligent/cfn_nag*** in our pipeline for this purpose.
 
@@ -188,7 +188,7 @@
 6. Save and Push your changes.
 7. If no errors, let's continue...
 
-### Checkov
+### Checkov [🔗](https://github.com/bridgecrewio/checkov-action)
 
 - *checkov*: Policy-as-code. Scans cloud infrastructure configurations to find misconfigurations.
 
@@ -256,7 +256,7 @@ Let's now create our CI pipeline for the application and explore the different t
 
 1. Let's start by creating our pipeline file `.github/workflows/ci-app.yml`.
 
-### Gitleaks
+### Gitleaks [🔗](https://github.com/zricethezav/gitleaks)
 
 - ***Gitleaks***: This tool helps in detecting and preventing hardcoded secrets like passwords, api keys, and tokens in git.
 
@@ -306,7 +306,7 @@ Let's now create our CI pipeline for the application and explore the different t
 
 5. Save and push your changes.
 
-### Pycharm Security
+### Pycharm Security [🔗](https://pycharm-security.readthedocs.io/en/latest/github.html)
 
 - ***PyCharm Security***: This tool allows you to run a security check to your repository.
 
@@ -334,7 +334,7 @@ Let's now create our CI pipeline for the application and explore the different t
 4. Please notice that your pipeline continues even when warnings are flagged, if you want to modify this behaviour and force the pipeline to fail, this can be achieved by adding extra argument: `fail_on_warnings` and set that to `yes`.
 5. You can explore this on your own; For the purpose of the demo, let's continue...
 
-### Grype (Anchore)
+### Grype (Anchore) [🔗](https://github.com/marketplace/actions/anchore-container-scan)
 
 - ***Grype (Anchore)***: Vulnerability scanner for container images and filesystems.
 
@@ -365,7 +365,7 @@ Let's now create our CI pipeline for the application and explore the different t
 
 4. Awesome!! Let's continue...
 
-### Build docker image
+### Build docker image 
 
 1. Add docker build job code block to `.github/workflows/ci-app.yml` file:
 
@@ -416,7 +416,7 @@ Let's now create our CI pipeline for the application and explore the different t
               retention-days: 1
     ```
 
-### docker-trivy
+### docker-trivy [🔗](https://github.com/marketplace/actions/aqua-security-trivy)
 
 - Lets scan our Docker image for vulnerabilities, add *Docker-trivy-vuln* job to pipeline.
 
@@ -457,7 +457,7 @@ Let's now create our CI pipeline for the application and explore the different t
 
     `exit-code: '0'`
 
-### docker-grype
+### docker-grype [🔗](https://github.com/marketplace/actions/anchore-container-scan)
 
 - Lets invoke our vulnerability scanner for container images - *Grype*
 
