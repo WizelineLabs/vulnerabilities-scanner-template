@@ -329,7 +329,8 @@ Let's now create our CI pipeline for the application and explore the different t
 
           - name: Run PyCharm Security
             uses: tonybaloney/pycharm-security@master
-            fail_on_warnings: "no"
+            with: 
+              fail_on_warnings: "no"
     ```
 
 2. Save and Push your changes.
